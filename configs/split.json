@@ -1,0 +1,18 @@
+{
+  "descripcion": "Particion cronologica del panel de casos (210+220), semana 53 plegada a 52. Calculado sobre los 3 CSV reales de SIVIGILA.",
+  "periodo": {"inicio": "2007-01-01", "fin": "2022-12-05", "n_semanas": 832},
+  "train_end": 727,
+  "val_end": 779,
+  "test_end": 831,
+  "fechas": {
+    "train_hasta": "2020-12-07",
+    "val_hasta": "2021-12-06",
+    "test_hasta": "2022-12-05"
+  },
+  "rolling_origin": {
+    "initial": 728,
+    "horizon": 8,
+    "step": 4
+  },
+  "nota": "rolling_origin.initial = train_end+1. horizon=8 semanas (~2 meses) y step=4 son valores iniciales razonables para alertas tempranas; ajustar si C1/C2 muestran que el tiempo de computo no alcanza para todas las series con estos parametros."
+}

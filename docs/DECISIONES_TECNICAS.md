@@ -27,3 +27,10 @@
 | P-07 | Qué municipios se modelan individualmente vs. agregados | Propuesta |
 | P-08 | Mortalidad (580) como panel separado | Propuesta |
 | P-09 | Estructura del repositorio y convención de commits | Implementada en este esqueleto; pendiente de que el equipo la ratifique |
+
+## Aprobadas — 2026-10-26
+
+| Decisión | Razón |
+|---|---|
+| Partición: train hasta 2020 (semana 727), val=2021, test=2022 | Deja un año completo de prueba y uno de validación sin romper los ciclos multianuales de brote |
+| Alcance de series para la Fase 2: nacional + 34 departamentos + top 30 municipios elegibles | 65 series es computacionalmente viable en 3 días; 690 series elegibles no lo es (cubrirían 99,1% de los casos pero exceden el tiempo disponible) |

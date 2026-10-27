@@ -1,0 +1,31 @@
+{
+  "filas_crudas": 223651,
+  "filas_ajenas_excluidas": 22,
+  "eventos_ajenos": {
+    "831": 9,
+    "875": 5,
+    "470": 2,
+    "300": 2,
+    "620": 2,
+    "490": 1,
+    "895": 1
+  },
+  "filas_tras_excluir_ajenas": 223629,
+  "filas_invalidas_adicionales": 4546,
+  "filas_validas_para_panel": 219083,
+  "filas_validas_por_evento": {
+    "210": 196501,
+    "220": 21096,
+    "580": 1486
+  },
+  "municipios_unicos_dataset_completo": 1158,
+  "municipios_unicos_filas_validas": 1124,
+  "periodo": [
+    2007,
+    2022
+  ],
+  "suma_conteo_casos_210_220": 1184953.0,
+  "suma_conteo_mortalidad_580": 1551.0,
+  "filas_clave_duplicada": 0,
+  "filas_semana_53": 696
+}
