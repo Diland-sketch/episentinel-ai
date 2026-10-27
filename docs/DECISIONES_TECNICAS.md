@@ -34,3 +34,6 @@
 |---|---|
 | Partición: train hasta 2020 (semana 727), val=2021, test=2022 | Deja un año completo de prueba y uno de validación sin romper los ciclos multianuales de brote |
 | Alcance de series para la Fase 2: nacional + 34 departamentos + top 30 municipios elegibles | 65 series es computacionalmente viable en 3 días; 690 series elegibles no lo es (cubrirían 99,1% de los casos pero exceden el tiempo disponible) |
+| SARIMA se ajusta sobre log1p(casos) | Sobredispersión confirmada en el EDA real (varianza >> media en casi todos los municipios) |
+| Canal endémico: semana/año por posición (52 semanas/año), no por calendario ISO | Debe quedar alineado con construir_panel(), que tampoco usa ISO |
+| Zonas del canal endémico: éxito ≤p25, seguridad ≤mediana, alerta ≤p90, epidemia >p90 | Formulación clásica de franjas sobre percentiles logarítmicos; documentar si se cambia a otra definición (P-02 sigue abierta para "brote" formal) |
