@@ -15,6 +15,7 @@ dependencies = [
 [project.optional-dependencies]
 dev = ["pytest>=7.4"]
 models = ["prophet>=1.1"]
+app = ["streamlit>=1.50", "plotly>=5.18"]
 
 [tool.pytest.ini_options]
 pythonpath = ["src"]

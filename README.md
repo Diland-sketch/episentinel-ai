@@ -11,6 +11,15 @@ Esqueleto inicial del repositorio (tarea A1) + generador sintético del panel
 (tarea A2). **Todavía no contiene datos reales, ni modelos, ni resultados.**
 Ver `docs/ESTADO_DEL_PROYECTO.md` para el estado actualizado.
 
+## Dashboard
+
+    pip install -e ".[dev,app]"
+    python scripts/build_lookup.py
+    python scripts/evaluate_fase2.py
+    streamlit run app/streamlit_app.py
+
+Requiere data/processed/panel_casos.parquet (scripts/build_panel.py) y los 3 CSV en data/raw/.
+
 ## Estructura
 
 ```

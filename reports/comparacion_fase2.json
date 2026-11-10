@@ -1,0 +1,206 @@
+[
+  {
+    "serie": "NACIONAL",
+    "modelo": "ingenua_estacional",
+    "mae": 413.7307692307692,
+    "rmse": 499.3383699379687,
+    "mase": 0.3906709850305653,
+    "tiempo_s": 0.0
+  },
+  {
+    "serie": "NACIONAL",
+    "modelo": "ingenua_ultimo_valor",
+    "mae": 248.25,
+    "rmse": 309.4722865683552,
+    "mase": 0.23441348636978562,
+    "tiempo_s": 0.0
+  },
+  {
+    "serie": "NACIONAL",
+    "modelo": "sarima_estacional",
+    "mae": 242.67190742438498,
+    "rmse": 304.2363452708295,
+    "mase": 0.22914629552207832,
+    "tiempo_s": 4.475,
+    "cobertura_ic95": 0.8461538461538461
+  },
+  {
+    "serie": "NACIONAL",
+    "modelo": "sarima_sin_estacional",
+    "mae": 255.05031664965534,
+    "rmse": 319.75857343462656,
+    "mase": 0.2408347791563484,
+    "tiempo_s": 0.317,
+    "cobertura_ic95": 0.8461538461538461
+  },
+  {
+    "serie": "76001",
+    "modelo": "ingenua_estacional",
+    "mae": 56.32692307692308,
+    "rmse": 65.79645185663948,
+    "mase": 0.37851808774796236,
+    "tiempo_s": 0.0
+  },
+  {
+    "serie": "76001",
+    "modelo": "ingenua_ultimo_valor",
+    "mae": 25.01923076923077,
+    "rmse": 26.69233540233543,
+    "mase": 0.1681297480915326,
+    "tiempo_s": 0.0
+  },
+  {
+    "serie": "76001",
+    "modelo": "sarima_estacional",
+    "mae": 28.193601098066658,
+    "rmse": 29.68036357365744,
+    "mase": 0.18946158233772284,
+    "tiempo_s": 3.857,
+    "cobertura_ic95": 1.0
+  },
+  {
+    "serie": "76001",
+    "modelo": "sarima_sin_estacional",
+    "mae": 30.55412444274409,
+    "rmse": 31.938336316388877,
+    "mase": 0.205324348022465,
+    "tiempo_s": 0.261,
+    "cobertura_ic95": 1.0
+  },
+  {
+    "serie": "05001",
+    "modelo": "ingenua_estacional",
+    "mae": 2.480769230769231,
+    "rmse": 3.1163341383007155,
+    "mase": 0.026549062844542448,
+    "tiempo_s": 0.0
+  },
+  {
+    "serie": "05001",
+    "modelo": "ingenua_ultimo_valor",
+    "mae": 3.7115384615384617,
+    "rmse": 4.1717917198544505,
+    "mase": 0.039720690922454976,
+    "tiempo_s": 0.0
+  },
+  {
+    "serie": "05001",
+    "modelo": "sarima_estacional",
+    "mae": 2.3943762292643083,
+    "rmse": 2.8369628651125645,
+    "mase": 0.025624489451002076,
+    "tiempo_s": 5.576,
+    "cobertura_ic95": 0.9807692307692307
+  },
+  {
+    "serie": "05001",
+    "modelo": "sarima_sin_estacional",
+    "mae": 2.4718406313186487,
+    "rmse": 2.9039517791527873,
+    "mase": 0.02645350943917642,
+    "tiempo_s": 0.181,
+    "cobertura_ic95": 1.0
+  },
+  {
+    "serie": "54001",
+    "modelo": "ingenua_estacional",
+    "mae": 25.692307692307693,
+    "rmse": 31.839742944459065,
+    "mase": 0.6439662592528835,
+    "tiempo_s": 0.0
+  },
+  {
+    "serie": "54001",
+    "modelo": "ingenua_ultimo_valor",
+    "mae": 23.326923076923077,
+    "rmse": 24.4064146675229,
+    "mase": 0.5846789464623859,
+    "tiempo_s": 0.0
+  },
+  {
+    "serie": "54001",
+    "modelo": "sarima_estacional",
+    "mae": 27.9510380786506,
+    "rmse": 29.050728440516117,
+    "mase": 0.7005803312534907,
+    "tiempo_s": 3.246,
+    "cobertura_ic95": 1.0
+  },
+  {
+    "serie": "54001",
+    "modelo": "sarima_sin_estacional",
+    "mae": 27.010865403991055,
+    "rmse": 27.93539765048556,
+    "mase": 0.6770153215391802,
+    "tiempo_s": 0.157,
+    "cobertura_ic95": 1.0
+  },
+  {
+    "serie": "68001",
+    "modelo": "ingenua_estacional",
+    "mae": 4.5,
+    "rmse": 5.744562646538029,
+    "mase": 0.09743910056214866,
+    "tiempo_s": 0.0
+  },
+  {
+    "serie": "68001",
+    "modelo": "ingenua_ultimo_valor",
+    "mae": 3.6923076923076925,
+    "rmse": 4.710871224339262,
+    "mase": 0.07995003123048096,
+    "tiempo_s": 0.0
+  },
+  {
+    "serie": "68001",
+    "modelo": "sarima_estacional",
+    "mae": 3.664271323199559,
+    "rmse": 4.755951721791584,
+    "mase": 0.07934295598849764,
+    "tiempo_s": 3.14,
+    "cobertura_ic95": 0.9230769230769231
+  },
+  {
+    "serie": "68001",
+    "modelo": "sarima_sin_estacional",
+    "mae": 3.795477615877779,
+    "rmse": 4.8697582723472825,
+    "mase": 0.08218398335442204,
+    "tiempo_s": 0.205,
+    "cobertura_ic95": 0.9230769230769231
+  },
+  {
+    "serie": "73001",
+    "modelo": "ingenua_estacional",
+    "mae": 4.730769230769231,
+    "rmse": 5.747909318914273,
+    "mase": 0.08509797138691903,
+    "tiempo_s": 0.0
+  },
+  {
+    "serie": "73001",
+    "modelo": "ingenua_ultimo_valor",
+    "mae": 3.230769230769231,
+    "rmse": 3.8230072737812852,
+    "mase": 0.058115687776432515,
+    "tiempo_s": 0.0
+  },
+  {
+    "serie": "73001",
+    "modelo": "sarima_estacional",
+    "mae": 3.03110466858898,
+    "rmse": 4.0145910319501015,
+    "mase": 0.05452408388062508,
+    "tiempo_s": 3.93,
+    "cobertura_ic95": 0.9615384615384616
+  },
+  {
+    "serie": "73001",
+    "modelo": "sarima_sin_estacional",
+    "mae": 3.222044942493297,
+    "rmse": 4.311715176745075,
+    "mase": 0.05795875362939192,
+    "tiempo_s": 0.255,
+    "cobertura_ic95": 0.9615384615384616
+  }
+]

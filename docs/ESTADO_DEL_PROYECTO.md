@@ -15,3 +15,12 @@
 - Resultados (origen: real): SARIMA con estacionalidad(52) sobre 832 semanas tarda ~2,5 s (serie nacional) y ~1,6 s (un municipio). Para las 65 series seleccionadas: ~2-3 minutos en total. El alcance definido es viable en el tiempo disponible.
 - Problemas abiertos: panel_casos (1.124 municipios) y panel_muertes (377 municipios) tienen universos distintos; si se cruzan, usar panel_muertes.reindex(panel_casos.index, fill_value=0).
 - Siguiente paso: Kevin continúa con B2 (ingenua estacional) y B3 (adaptador EARS) sobre el canal_endemico.py ya existente; Kerin continúa con C2 (Prophet) y C4 (rolling origin) usando sarima.py ya existente.
+
+## 2026-11-09 — Dashboard y alertas (adelanto de la Fase 3 para la presentación del 10-nov)
+
+- Qué se hizo: dashboard Streamlit (app/streamlit_app.py) con 5 pestañas (resumen, exploración, pronóstico, alertas, evaluación); módulo detection/alertas.py con tres reglas (SARIMA un paso adelante, EARS C2, canal endémico) y semáforo; baseline de último valor; scripts/build_lookup.py (nombres de municipios y reporte de limpieza); evaluate_fase2.py ampliado a 4 modelos; 9 pruebas nuevas (30 en total).
+- Qué se decidió (y por qué): las alertas usan predicción un paso adelante con parámetros fijos del entrenamiento, porque el pronóstico a 52 semanas tiene un IC95 demasiado ancho para detectar anomalías. Rojo = 2 o más reglas, porque EARS C2 sobre-alerta en series agregadas grandes.
+- Resultados (origen: real, año de prueba 2022, nacional + 5 municipios): MASE promedio ingenua estacional 0,270; ingenua último valor 0,194; SARIMA estacional 0,213; SARIMA sin estacional 0,215. Alertas 2021–2022 (semanas rojo/amarillo/verde): nacional 2/20/82; Cali 0/4/100; Cúcuta 4/17/83.
+- Hallazgos de calidad: 53 de los 1.124 "municipios" son países extranjeros (Exterior_*, 2.442 casos = 0,21 %); la semana 53 sumada a la 52 duplica esa semana en 2008, 2014 y 2020 (2014-S52: 2.044 + 2.470 = 4.514); estacionalidad anual débil (fuerza STL 0,00, correlación media entre años 0,04).
+- Problemas abiertos: las alertas no están validadas (sin etiquetas de brote); ventaja de SARIMA no demostrada frente al baseline de último valor; evaluación solo en 6 de 65 series, todas grandes ciudades; no hay mapa geográfico (sin coordenadas).
+- Siguiente paso: validación de origen móvil con horizonte de 8 semanas en las 65 series; corregir semana 53; etiquetas de referencia (boletines INS) para medir las alertas.

@@ -37,3 +37,19 @@
 | SARIMA se ajusta sobre log1p(casos) | Sobredispersión confirmada en el EDA real (varianza >> media en casi todos los municipios) |
 | Canal endémico: semana/año por posición (52 semanas/año), no por calendario ISO | Debe quedar alineado con construir_panel(), que tampoco usa ISO |
 | Zonas del canal endémico: éxito ≤p25, seguridad ≤mediana, alerta ≤p90, epidemia >p90 | Formulación clásica de franjas sobre percentiles logarítmicos; documentar si se cambia a otra definición (P-02 sigue abierta para "brote" formal) |
+
+## Confirmada por Diland — 2026-11-09
+
+| Decisión | Razón |
+|---|---|
+| Construir un prototipo gráfico para la presentación del 10-nov | Lo exige el documento de entregas; hoy no había interfaz |
+
+## Propuestas nuevas (pendientes de ratificar por el equipo)
+
+| ID | Propuesta | Estado |
+|---|---|---|
+| P-04 | Prototipo en Streamlit (implementado); Power BI sigue opcional | Implementada, pendiente de ratificar |
+| P-10 | Alertas: SARIMA un paso adelante + EARS C2 + canal endémico; semáforo rojo con 2 o más reglas | Implementada, pendiente de ratificar |
+| P-11 | Excluir "Exterior" (cod_dpto 01, 53 registros) de las vistas territoriales y del nivel nacional | Implementada en el dashboard; falta aplicarla en el panel |
+| P-12 | Incorporar "último valor" como baseline obligatorio | Propuesta |
+| P-05 | (evidencia nueva) la suma de la semana 53 a la 52 duplica esa semana en 2008, 2014 y 2020; alternativas: promediar S52 y S53, o malla de 53 semanas con fechas reales | Sigue abierta |
