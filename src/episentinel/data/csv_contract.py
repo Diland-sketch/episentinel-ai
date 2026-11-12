@@ -40,28 +40,36 @@ class AuditResult:
         return any(i.severity == "error" for i in self.issues)
 
 
-def read_csv_records(path: str | Path, fields: tuple[str, ...]):
-    path = Path(path)
-    data = path.read_bytes()
-    result = AuditResult(path.name, hashlib.sha256(data).hexdigest())
+def read_csv_records(
+    path: str | Path | bytes, fields: tuple[str, ...], *, source_name: str | None = None,
+):
+    if isinstance(path, bytes):
+        data = path
+        name = "<memory>"
+    else:
+        path = Path(path)
+        data = path.read_bytes()
+        name = path.name
+    name = source_name if source_name is not None else name
+    result = AuditResult(name, hashlib.sha256(data).hexdigest())
     rows = []
     try:
         stream = io.StringIO(data.decode("utf-8-sig"), newline="")
         reader = csv.reader(stream, delimiter=",", quotechar='"', strict=True)
         header = next(reader, None)
         if header is None or len(header) != len(set(header)) or set(header) != set(fields):
-            result.issues.append(Issue(path.name, 1, None, repr(header), "schema", "Exact unique headers required"))
+            result.issues.append(Issue(name, 1, None, repr(header), "schema", "Exact unique headers required"))
             return result, rows
         for record, values in enumerate(reader, 2):
             result.rows_read += 1
             if len(values) != len(header):
-                result.issues.append(Issue(path.name, record, None, repr(values), "row_width", "Unexpected number of fields"))
+                result.issues.append(Issue(name, record, None, repr(values), "row_width", "Unexpected number of fields"))
             else:
                 rows.append((record, dict(zip(header, values))))
         if not result.rows_read:
-            result.issues.append(Issue(path.name, None, None, None, "empty", "At least one data record required"))
+            result.issues.append(Issue(name, None, None, None, "empty", "At least one data record required"))
     except (UnicodeDecodeError, csv.Error) as exc:
-        result.issues.append(Issue(path.name, None, None, None, "csv", str(exc)))
+        result.issues.append(Issue(name, None, None, None, "csv", str(exc)))
     return result, rows
 
 
@@ -128,9 +136,9 @@ def validate_observation(result, row, *, expected_event=None, columns=None):
     return valid
 
 
-def read_canonical(path: str | Path) -> AuditResult:
+def read_canonical(path: str | Path | bytes, *, source_name: str | None = None) -> AuditResult:
     """Return audit partitions. Callers MUST check blocked before using data."""
-    result, rows = read_csv_records(path, FIELDS)
+    result, rows = read_csv_records(path, FIELDS, source_name=source_name)
     for record, raw in rows:
         values = {c: parse_integer(result, record, c, raw[c]) for c in FIELDS[1:]}
         if values["ano"] is not None and not re.fullmatch(r"[0-9]{4}", raw["ano"]):
