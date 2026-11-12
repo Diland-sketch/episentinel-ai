@@ -196,7 +196,7 @@ La ejecución inicial anterior usó un clon sin originales en `data/raw`, pytest
 resultados intercambiables. Tras trasladar el incremento al proyecto original,
 Codex también ejecutó 66 pruebas sin omisiones, antes de esta segunda iteración.
 
-### Estado de preparación
+### Estado de preparación de la segunda iteración (evidencia histórica)
 
 Este incremento es parcial respecto de los Issues: no cierra B01/B02 ni autoriza
 la integración del CSV a métodos. B02 sigue abierto por procedencia pendiente
@@ -236,3 +236,18 @@ git diff --check
 Resultado: preparado técnicamente para revisión de commit/PR como avance parcial,
 sin cierre automático de Issues. La procedencia institucional pendiente mantiene
 B02 abierto independientemente de las pruebas y de B03.
+
+
+### Actualización documental de procedencia B02 — 2026-11-11
+
+La fuente se identificó como conjunto `4hyg-wa9d` del Portal Nacional de Datos
+Abiertos. Diland comunica descarga del 23/09/2026 respaldada por su historial;
+no se confunde con publicación, corte de extracción ni actualización del portal.
+Se verificó la licencia actual CC BY-SA 4.0 en los metadatos oficiales.
+Ver [manifiesto actualizado](../data/README.md) y
+[procedimiento y reservas de reproducibilidad](PROCEDENCIA_B02.md).
+
+Esta actualización solo modifica documentación. Reutiliza los resultados técnicos
+anteriores; no se ejecutaron nuevamente la suite, la auditoría de CSV ni los scripts
+que regeneran paneles/reportes. La recuperación byte a byte desde una exportación
+actual no se da por demostrada. No se han cerrado Issues ni realizado commits.
