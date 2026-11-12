@@ -1,23 +1,42 @@
-# Procedencia de los datos
+# Procedencia y reproducción de los datos — B02
 
-> Completar en la tarea A7. Sin campos "PENDIENTE" antes de citar cifras en
-> el documento técnico.
+## Identificación y fechas
 
-- Fuente: SIVIGILA — Instituto Nacional de Salud (INS)
-- ID del dataset / URL de descarga: PENDIENTE
-- Fecha de descarga: PENDIENTE
-- Eventos incluidos: 210 (dengue), 220 (dengue grave), 580 (mortalidad por dengue)
-- Licencia / condiciones de uso: PENDIENTE
-- Archivos originales: Dengue_210.csv, Dengue_220.csv, Dengue_580.csv (nombres verificados en los originales facilitados)
+- Portal: Portal Nacional de Datos Abiertos de Colombia.
+- Conjunto: **Datos de Vigilancia en Salud Pública de Colombia**.
+- Identificador institucional: **`4hyg-wa9d`**.
+- [Ficha oficial](https://www.datos.gov.co/Salud-y-Protecci-n-Social/Datos-de-Vigilancia-en-Salud-P-blica-de-Colombia/4hyg-wa9d/about_data).
+- [Metadatos oficiales consultados](https://www.datos.gov.co/api/views/4hyg-wa9d.json).
+- Entidad atribuida en los metadatos: Instituto Nacional de Salud - INS, Bogotá D.C.
+- Descarga histórica: **23/09/2026**, según evidencia del historial comunicada por
+  Diland, responsable del proyecto. No se inspeccionó ni incorporó el historial
+  personal al repositorio; la fecha tiene ese respaldo declarado por el responsable.
+- Consulta de metadatos y actualización documental: **11/11/2026**.
+- Fecha de publicación, actualización del portal y fecha de extracción/corte interno:
+  no se equiparan a la descarga del usuario. El corte exacto de extracción histórico
+  no está acreditado; el periodo observado en los archivos es 2007–2022.
 
+## Condiciones de reutilización verificadas
 
-## Originales auditados en B01/B02 — 2026-11-11
+Los metadatos actuales del conjunto declaran `licenseId: CC_40_BY_SA` y
+`Creative Commons Attribution | Share Alike 4.0 International`.
+Ver [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/) y su
+[código legal](https://creativecommons.org/licenses/by-sa/4.0/legalcode.es).
+La reutilización requiere atribución, enlace de licencia e identificación de cambios;
+el material adaptado que se comparta queda sujeto a CompartirIgual y no se deben
+imponer restricciones adicionales incompatibles. Conservar los avisos aplicables.
+Esto documenta la licencia de los datos, no asigna una licencia al software del proyecto.
 
-Fuente declarada por el equipo: SIVIGILA/INS. La procedencia institucional aún
-no está acreditada por URL, diccionario, fecha de extracción o licencia.
-Fecha original de descarga: PENDIENTE; la fecha de auditoría no la sustituye.
-El paquete de trabajo de Fase 2 es contexto histórico, no autorización ni
-sustituto del diccionario oficial. Los archivos permanecen fuera de Git.
+La ficha HTML no expuso su contenido al lector de páginas; se verificaron sus
+metadatos JSON oficiales mediante consulta de solo lectura. Se confirma la licencia
+publicada actualmente, no una captura de sus términos exactos el 23/09/2026.
+
+## Manifiesto de originales históricos
+
+Los tres archivos facilitados por Diland son las copias de referencia utilizadas
+por el proyecto. No se incluyen en Git. Auditoría técnica ya ejecutada el 11/11/2026:
+223.651 registros en total, nueve columnas, periodo 2007–2022 y 22 filas de eventos
+ajenos. La ausencia de celdas vacías no acredita cobertura temporal completa.
 
 | Archivo | Bytes | Registros sin encabezado | SHA-256 |
 |---|---:|---:|---|
@@ -25,30 +44,37 @@ sustituto del diccionario oficial. Los archivos permanecen fuera de Git.
 | Dengue_220.csv | 1605487 | 21557 | 541836debc708dbd2b4f429b812d44b6a337069e89d620de6afc7f479d4385eb |
 | Dengue_580.csv | 125512 | 1511 | 80520bbc136acb69fbf2862dbf76499f4fd7ebe4ac3d75bdfb788c4cbfaf6854 |
 
-Los tres contienen nueve columnas, periodo 2007–2022, conteos positivos y
-22 registros de eventos ajenos en total. Ausencia de celda vacía no significa
-cobertura completa. No contienen identificadores individuales ni etiquetas de brote.
-Para reconstruir la comprobación, obtener estos mismos archivos por un canal
-permitido y ejecutar `scripts/audit_csv_sources.py --source-dir <carpeta>`.
-No existe todavía una descarga pública documentada que permita reconstruirlos
-solo desde el repositorio. Ver `docs/CONTRATO_CSV.md` para alcance y limitaciones.
 
+## Recuperación, comprobación y reconstrucción
 
-## Estado de B02: parcial y abierto
+Ver [procedimiento B02](../docs/PROCEDENCIA_B02.md) para:
 
-La identificación por huella y la conciliación están verificadas. Aún no existe
-procedencia suficiente para que un tercero recupere los originales desde cero.
-Estos pendientes pertenecen a B02; no se consideran resueltos por las decisiones B03.
+1. Recuperar una copia histórica conservada y contrastar las tres huellas.
+2. Hacer una nueva exportación del portal sin atribuirle identidad histórica.
+3. Ejecutar la auditoría de solo lectura y reconstruir salidas heredadas en una
+   carpeta nueva, sin sobrescribir las salidas del proyecto de trabajo.
 
-| Campo de procedencia | Estado y evidencia requerida |
-|---|---|
-| URL o identificador institucional | **PENDIENTE**: enlace/ID oficial del conjunto y de la exportación de cada evento. |
-| Fecha de descarga o extracción | **PENDIENTE**: fecha y, si existe, versión/corte de la fuente; no usar fecha de auditoría. |
-| Condiciones de uso | **PENDIENTE**: enlace o texto institucional aplicable, atribución y condiciones de redistribución. |
-| Procedimiento de recuperación | **PENDIENTE**: consulta/filtros, eventos, periodo, opciones de exportación y pasos exactos para obtener los mismos bytes o explicar cambios de versión. |
+La igualdad de huellas acredita identidad de bytes. Una exportación nueva puede
+cambiar contenido, orden, formato o encabezados y no debe sustituir los originales.
 
-Procedimiento disponible hoy: quien ya posea los archivos puede colocarlos fuera
-de Git y ejecutar `scripts/audit_csv_sources.py --source-dir <carpeta>` para
-verificar las huellas. Esto verifica una copia existente; **no es un procedimiento
-de recuperación institucional**. La solicitud de esa evidencia al custodio de los
-originales sigue pendiente. No se ha inferido una URL ni licencia desde sus nombres.
+## Estado documental y evidencias restantes
+
+Fuente, identificador, fecha de descarga declarada, condiciones actuales de uso,
+huellas y pasos de reconstrucción desde originales conservados están documentados.
+Se reutiliza la evidencia técnica de la segunda iteración: 82 pruebas aprobadas y
+25 controles verdaderos; no se repitió esa auditoría en esta actualización documental.
+
+Pendientes de trazabilidad histórica:
+
+- Referencia compartible y no sensible que respalde el historial de descarga,
+  si el equipo necesita verificarlo sin depender de la declaración del responsable.
+- Consulta/filtros y opciones exactas de las exportaciones del 23/09/2026, o un
+  archivo institucional versionado que permita recuperarlas byte a byte.
+- Ubicación de resguardo histórico accesible al equipo: las copias locales están
+  recuperadas, pero no se ha acreditado un archivo compartido de preservación.
+
+No se inventan URL de descarga histórica ni filtros que expliquen las 22 filas
+ajenas. B02 tiene documentación suficiente para reproducir el procesamiento desde
+las copias identificadas; no se acredita recuperación institucional exacta desde
+cero. El cierre debe explicitar ese límite o completar la evidencia histórica.
+No se ha cerrado el Issue #2.
