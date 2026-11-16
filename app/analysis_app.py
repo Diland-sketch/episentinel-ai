@@ -16,10 +16,12 @@ from app.analysis_presenter import (
 )
 
 
-def main():
-    st.set_page_config(page_title="EpiSentinel AI · Centro de vigilancia", page_icon="◈",
+def main(embedded=False):
+    if not embedded:
+        st.set_page_config(page_title="EpiSentinel AI · Centro de vigilancia", page_icon="◈",
                        layout="wide", initial_sidebar_state="collapsed")
-    st.markdown((ROOT / "app/analysis_styles.css").read_text(encoding="utf-8"), unsafe_allow_html=True)
+    if not embedded:
+        st.markdown((ROOT / "app/analysis_styles.css").read_text(encoding="utf-8"), unsafe_allow_html=True)
     if "epi_work" not in st.session_state:
         st.session_state.epi_work = new_state()
     state = st.session_state.epi_work
@@ -61,9 +63,14 @@ def main():
     except (ValueError, TypeError, KeyError):
         cfg = None
     ensure_current(state, cfg)
-    st.markdown('<div class="epi-brand"><span class="epi-mark">E</span><div>EpiSentinel <b>AI</b><small>VIGILANCIA CON EVIDENCIA</small></div><span class="epi-academic">PROTOTIPO ACADÉMICO</span></div>', unsafe_allow_html=True)
-    nav = st.radio("Navegación principal", ("Inicio", "Analizar datos", "Evidencia"),
+    if not embedded:
+        st.markdown('<div class="epi-brand"><span class="epi-mark">E</span><div>EpiSentinel <b>AI</b><small>VIGILANCIA CON EVIDENCIA</small></div><span class="epi-academic">PROTOTIPO ACADÉMICO</span></div>', unsafe_allow_html=True)
+    if embedded and "epi_nav" not in st.session_state:
+        st.session_state.epi_nav = st.session_state.get("epi_observatory_nav", "Inicio")
+    nav = st.radio("Recorrido del Observatorio" if embedded else "Navegación principal", ("Inicio", "Analizar datos", "Evidencia"),
                    horizontal=True, key="epi_nav", label_visibility="collapsed")
+    if embedded:
+        st.session_state.epi_observatory_nav = nav
     st.markdown('<div class="epi-rule"></div>', unsafe_allow_html=True)
     if nav == "Inicio":
         hero()
