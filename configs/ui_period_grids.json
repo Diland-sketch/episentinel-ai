@@ -1,0 +1,30 @@
+{
+  "profiles": [
+    {
+      "id": "documented-cali-2020-2021-v1",
+      "label": "Tres periodos documentados · 2020–2021",
+      "config_version": "b08-demo-v1",
+      "periods": [
+        [
+          2020,
+          52
+        ],
+        [
+          2020,
+          53
+        ],
+        [
+          2021,
+          1
+        ]
+      ],
+      "calendar_metadata": {
+        "calendar_id": "documented-periods-cali",
+        "version": "1",
+        "source": "Etiquetas observadas en originales auditados, municipio 76001, eventos 210/220. Conjunto 4hyg-wa9d; descarga declarada 23/09/2026.",
+        "verification": "unverified",
+        "evidence": "docs/DEMO_B08.md; data/processed/b08_demo_manifest.json (copia local ignorada)"
+      }
+    }
+  ]
+}
