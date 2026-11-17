@@ -135,13 +135,26 @@ def test_forecast_requires_click_and_configuration_change_hides_old_result(artif
     assert not page.exception and not page.get("plotly_chart")
 
 
-def test_documentation_is_available_without_any_historical_data(artifacts):
+def test_documentation_is_available_without_any_historical_data(artifacts, monkeypatch):
+    prohibit_models(monkeypatch)
+    import episentinel.services.forecast_service as forecast
+    def unexpected_forecast(*args, **kwargs):
+        pytest.fail("Methodology must not execute the forecast service")
+    monkeypatch.setattr(forecast, "generar_pronostico", unexpected_forecast)
     page = app()
     page.radio(key="epi_platform_nav").set_value(EVIDENCE).run()
     page.radio(key="epi_evidence_source").set_value("Metodología y contratos").run()
     assert not page.exception
     assert any(e.label == "Contrato de señales B07" for e in page.expander)
-    assert any("B06-I1" in item.value for item in page.info)
+    methods = ("Último valor", "Ingenua estacional", "SARIMA estacional", "SARIMA no estacional")
+    assert any(all(method in item.value for method in methods) for item in page.markdown)
+    assert any("convergencia" in item.value and "errores estructurados" in item.value for item in page.info)
+    assert any("no equivale" in item.value and "validación epidemiológica" in item.value for item in page.caption)
+    contract = next(e for e in page.expander if e.label == "Contrato de pronóstico B06-I2")
+    assert any("docs/CONTRATO_PRONOSTICO_B06.md" in item.value for item in contract.caption)
+    assert any("# B06-I2 — contrato del servicio de pronóstico" in item.value for item in contract.markdown)
+    assert not any("B06-I1 ofrece" in item.value for item in page.info)
+    assert not page.get("plotly_chart")
 
 
 def test_embedded_b08_rejects_invalid_csv(artifacts):
