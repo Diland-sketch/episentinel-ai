@@ -1,0 +1,33 @@
+{
+  "protocol_version": "b10-i2-v1",
+  "scope": "retrospective_positional_planning_only",
+  "real_execution_authorized": false,
+  "calendar_status": "pending_B03",
+  "event_policy": "pending_B03_B09",
+  "territorial_universe_status": "pending_B09",
+  "candidate_universe": null,
+  "selection_criteria": null,
+  "positional_example": {
+    "train_size": 728,
+    "validation_end": 780,
+    "total_size": 832,
+    "horizon": 8,
+    "step": 4,
+    "window": "expanding",
+    "cohort_policy": "fixed_initial_training",
+    "methods": ["ultimo_valor", "ingenua_estacional", "sarima_sin_estacional", "sarima_estacional"]
+  },
+  "selection_score": "initial_training_sum_desc_code_asc",
+  "initial_missing_policy": "exclude_series_without_imputation",
+  "incomplete_tail_policy": "exclude_origin_and_record_reason",
+  "metrics_policy": {
+    "point": ["mae", "rmse", "mase"],
+    "mase_scale": "training_prefix_at_each_origin",
+    "mase_lag": "pending_calendar_decision",
+    "undefined_metric": "null_with_explicit_reason",
+    "missing_targets": "not_evaluable_no_imputation_no_truncation",
+    "intervals": "nominal_coverage_and_width_when_available",
+    "comparison": "common_support_plus_all_failure_counts_by_territorial_level"
+  },
+  "notes": "728/780/832 are illustrative exclusive positional boundaries, not an approved epidemiological calendar. No automatic input loading or forecasting executor exists in I2."
+}
