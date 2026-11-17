@@ -5,13 +5,13 @@ Proyecto de aula — Inteligencia Artificial, 7.º semestre, Ingeniería de
 Sistemas, Universidad Popular del Cesar. Equipo DKK (Diland López, Kevin
 Noriega, Kerin Maestre).
 
-## Plataforma integrada I1
+## Plataforma integrada I2
 
 ```powershell
-.\.venv\Scripts\python.exe -B -m streamlit run app/platform_app.py --server.address 127.0.0.1 --server.port 8503 --server.headless true --browser.gatherUsageStats false
+.\.venv\Scripts\python.exe -B -m streamlit run app/platform_app.py --server.address 127.0.0.1 --server.port 8504 --server.headless true --browser.gatherUsageStats false
 ```
 
-Observatorio Epidemiológico (B08), Laboratorio de Machine Learning (cinco vistas históricas) y Evidencia y metodología. Ver [alcance, dependencias y pruebas](docs/PLATAFORMA_I1.md). Los cálculos históricos son explícitos; navegar no entrena modelos. B06/B07 se conservan sin conectarlos automáticamente a la carga B08.
+Observatorio Epidemiológico (B08), Laboratorio de Machine Learning (doce fases en cuatro capítulos y cinco vistas históricas) y Evidencia y metodología. Ver [recorrido científico, evidencia y pruebas I2](docs/PLATAFORMA_I2.md) y [dependencias I1](docs/PLATAFORMA_I1.md). Los cálculos históricos son explícitos; navegar no entrena modelos. B06/B07 se conservan sin conectarlos automáticamente a la carga B08.
 
 ## Estado histórico del esqueleto
 
