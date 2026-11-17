@@ -1,5 +1,6 @@
 """Reusable application services, independent of user interfaces."""
 
-from .forecast_service import Advertencia, ErrorPronostico, ForecastResult, generar_pronostico
+from .forecast_result import Advertencia, ErrorPronostico, ForecastResult
+from .forecast_service import generar_pronostico
 
 __all__ = ["Advertencia", "ErrorPronostico", "ForecastResult", "generar_pronostico"]
