@@ -67,8 +67,9 @@ def main(embedded=False):
         st.markdown('<div class="epi-brand"><span class="epi-mark">E</span><div>EpiSentinel <b>AI</b><small>VIGILANCIA CON EVIDENCIA</small></div><span class="epi-academic">PROTOTIPO ACADÉMICO</span></div>', unsafe_allow_html=True)
     if embedded and "epi_nav" not in st.session_state:
         st.session_state.epi_nav = st.session_state.get("epi_observatory_nav", "Inicio")
-    nav = st.radio("Recorrido del Observatorio" if embedded else "Navegación principal", ("Inicio", "Analizar datos", "Evidencia"),
-                   horizontal=True, key="epi_nav", label_visibility="collapsed")
+    with st.container(key="epi_secondary_nav"):
+        nav = st.radio("Recorrido del Observatorio" if embedded else "Navegación principal", ("Inicio", "Analizar datos", "Evidencia"),
+                       horizontal=True, key="epi_nav", label_visibility="collapsed")
     if embedded:
         st.session_state.epi_observatory_nav = nav
     st.markdown('<div class="epi-rule"></div>', unsafe_allow_html=True)

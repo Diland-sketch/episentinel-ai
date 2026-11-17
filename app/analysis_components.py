@@ -85,21 +85,29 @@ def render_result(result):
     summary = executive_summary(result)
     first, last = period_label(series.points[0].period), period_label(series.points[-1].period)
     st.markdown(f'<header class="epi-analysis-header"><div><div class="epi-eyebrow">LECTURA MUNICIPAL / OBSERVACIONES</div><h1>Municipio {escape(bundle.territory.code)}</h1><p>{escape(EVENT_LABELS[series.event_code])} <span>·</span> {escape(first)} — {escape(last)}</p><div class="epi-analysis-description">Una visión de los registros disponibles, su cobertura y los límites que deben acompañar cualquier interpretación.</div></div><aside><span class="epi-status">LECTURA CONSTRUIDA</span><small>Configuración {escape(result.config.version)}</small><small>Catálogo territorial pendiente</small></aside></header>', unsafe_allow_html=True)
-    st.markdown(f'''<section class="epi-executive" aria-label="Resumen ejecutivo de cobertura">
-<article class="epi-summary-primary"><span>OBSERVACIONES DISPONIBLES</span><div class="epi-summary-value">{summary['observed']}<small> / {summary['expected']}</small></div><p>Periodos con conteo informado</p><div class="epi-coverage-track"><i style="width:{100 * summary['observed'] / summary['expected']:.4f}%"></i></div><footer>{summary['coverage_label']} de cobertura en la malla declarada</footer></article>
-<article><span>LO QUE FALTA</span><div class="epi-summary-value">{summary['missing']}<small> {'periodo' if summary['missing'] == 1 else 'periodos'}</small></div><p>Sin observación disponible</p><footer>Una ausencia no representa cero casos.</footer></article>
-<article class="epi-summary-status"><span>ESTADO DE LA LECTURA</span><h3>Ejecución completa.<br>Elegibilidad no evaluada.</h3><p>{len(bundle.series)} serie municipal construida · {summary['warning_count']} avisos contextuales</p><footer>Sin pronósticos ni señales ejecutadas.</footer></article></section>''', unsafe_allow_html=True)
-    with st.container(border=True, key="epi_plot_shell"):
-        st.markdown('<div class="epi-chart-heading"><div><span class="epi-eyebrow">LA SERIE OBSERVADA</span><h2>Una evolución que merece contexto.</h2></div><span class="epi-chart-note">CONTEOS DEL ARCHIVO<br>Sin estimaciones añadidas</span></div>', unsafe_allow_html=True)
-        if series.coverage.observed_periods:
-            st.plotly_chart(observed_figure(series), width="stretch", theme=None,
-                            config={"displayModeBar": False, "displaylogo": False, "scrollZoom": False})
-        else:
-            st.info("Sin observaciones para esta selección. No se dibuja una curva ni se informa un total cero.")
-        st.caption("Los huecos se conservan. La franja ámbar identifica periodos sin observación, sin asignarles un conteo. No se infieren fechas epidemiológicas.")
+    chart, context = st.columns([2.1, 1], gap="medium", vertical_alignment="top")
     texts = interpretation_sections(series)
-    columns = ''.join(f'<article><span>0{i}</span><h3>{escape(title)}</h3><p>{escape(body)}</p></article>' for i, (title, body) in enumerate(texts, 1))
-    st.markdown(f'<section class="epi-interpretation"><div class="epi-eyebrow">LECTURA E INTERPRETACIÓN</div><h2>De los registros a una lectura responsable.</h2><div class="epi-interpretation-grid">{columns}</div></section>', unsafe_allow_html=True)
+    with chart:
+        with st.container(border=True, key="epi_plot_shell"):
+            st.markdown('<div class="epi-chart-heading"><div><span class="epi-eyebrow">SERIE OBSERVADA</span><h2>Conteos, con sus ausencias.</h2></div><span class="epi-chart-note">DEL ARCHIVO<br>Sin estimaciones</span></div>', unsafe_allow_html=True)
+            if series.coverage.observed_periods:
+                st.plotly_chart(observed_figure(series), width="stretch", theme=None,
+                                config={"displayModeBar": False, "displaylogo": False, "scrollZoom": False})
+            else:
+                st.info("Sin observaciones para esta selección. No se dibuja una curva ni se informa un total cero.")
+            st.caption("Ámbar: sin observación, sin asignar un conteo. Los huecos no se conectan. No se infieren fechas epidemiológicas.")
+        st.markdown(f'<div class="epi-reading"><strong>{escape(texts[0][0])}</strong><p>{escape(texts[0][1])}</p></div>', unsafe_allow_html=True)
+    with context:
+        st.markdown(f'''<section class="epi-coverage-card" aria-label="Resumen ejecutivo de cobertura">
+<span class="epi-eyebrow">COBERTURA DE LA MALLA</span><div class="epi-summary-value">{summary['observed']}<small> / {summary['expected']} periodos</small></div>
+<div class="epi-coverage-track"><i style="width:{100 * summary['observed'] / summary['expected']:.4f}%"></i></div>
+<p>{summary['coverage_label']} con conteo informado</p><div class="epi-missing"><b>{summary['missing']}</b> {'periodo sin observación' if summary['missing'] == 1 else 'periodos sin observación'}<small>Una ausencia no representa cero casos.</small></div>
+<footer>Lectura construida · {summary['warning_count']} avisos contextuales<br>Elegibilidad no evaluada.<br>Sin pronósticos ni señales ejecutadas.</footer></section>''', unsafe_allow_html=True)
+        st.markdown(f'<aside class="epi-reading epi-reading-limit"><strong>{escape(texts[2][0])}</strong><p>{escape(texts[2][1])}</p></aside>', unsafe_allow_html=True)
+    with st.expander("Interpretación y alcance de esta lectura"):
+        for title, body in texts:
+            st.markdown(f"**{title}**")
+            st.write(body)
     with st.expander("Datos observados y ausencias"):
         st.dataframe(point_rows(series), hide_index=True, width="stretch")
     render_evidence(result)

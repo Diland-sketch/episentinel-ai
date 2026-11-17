@@ -115,12 +115,12 @@ def observed_figure(series):
             marker=dict(symbol="square", size=11, color="#E3B45C", line=dict(color="#FFFFFF", width=1)), name="Sin observación",
             hovertemplate="%{x}<br>Sin observación; no equivale a cero<extra></extra>"))
     maximum = max((p.observed_count for p in series.points if p.observed_count is not None), default=0)
-    figure.update_layout(height=530, paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
-        font=dict(family="Inter, Segoe UI, Arial", color="#24353D", size=13),
-        margin=dict(l=65, r=45, t=35, b=65), legend=dict(orientation="h", y=1.12, font=dict(size=12)),
-        xaxis=dict(type="category", categoryorder="array", categoryarray=labels, title="Periodos declarados; sin fechas inferidas", automargin=True),
-        yaxis=dict(title="Conteo observado", domain=[0.17, 1], rangemode="tozero", dtick=1 if maximum <= 10 else None, gridcolor="#E9EEEA", zerolinecolor="#CCD8D2", automargin=True),
-        yaxis2=dict(domain=[0, 0.06], range=[0, 1], visible=False, fixedrange=True),
+    figure.update_layout(height=310 if len(labels) <= 12 else 390, paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
+        font=dict(family="Inter, Segoe UI, Arial", color="#24353D", size=12),
+        margin=dict(l=48, r=16, t=35, b=55), legend=dict(orientation="h", y=1.12, font=dict(size=12)),
+        xaxis=dict(anchor="free", position=0, type="category", categoryorder="array", categoryarray=labels, title="Periodos declarados; sin fechas inferidas", automargin=True),
+        yaxis=dict(title="Conteo observado", domain=[0.24 if missing else 0, 1], rangemode="tozero", dtick=1 if maximum <= 10 else None, gridcolor="#E9EEEA", zerolinecolor="#CCD8D2", automargin=True),
+        yaxis2=dict(domain=[0.04, 0.12], range=[0, 1], visible=False, fixedrange=True),
         hovermode="closest")
     return figure
 
