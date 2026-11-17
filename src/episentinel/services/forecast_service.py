@@ -1,16 +1,19 @@
-"""B06-I1: pronosticos desde un corte posicional inclusivo.
+"""B06-I2: pronosticos desde un corte posicional inclusivo.
 
 La malla de siete dias y el periodo heredado de 52 observaciones son
 provisionales, pendientes de B03. No representan una decision sobre semana
 53, calendario epidemiologico, territorio o ceros frente a faltantes.
 Solo se inspeccionan fechas y valores del prefijo hasta el corte; nunca se
 imputa, ordena o limpia la entrada. Este servicio no genera alertas.
+
+SARIMA usa minimos operativos provisionales de 30 (sin estacionalidad) y 156
+(estacional) observaciones. No garantizan suficiencia estadistica ni convergencia.
+Las constantes y conversiones numericas inexactas se rechazan solo para SARIMA;
+los baselines conservan la politica I1. No hay adaptacion de periodos B03/B05.
 """
 from __future__ import annotations
 
-from dataclasses import dataclass, field
 from numbers import Integral, Real
-from typing import Literal
 
 import numpy as np
 import pandas as pd
@@ -20,47 +23,10 @@ from episentinel.baselines.ingenua_estacional import (
     pronosticar_ultimo_valor,
 )
 
-Metodo = Literal["ultimo_valor", "ingenua_estacional"]
-
-
-@dataclass(frozen=True)
-class Advertencia:
-    codigo: str
-    mensaje: str
-
-
-@dataclass(frozen=True)
-class ErrorPronostico:
-    codigo: str
-    campo: str
-    mensaje: str
-    detalles: dict[str, object] = field(default_factory=dict)
-
-
-def _predicciones_vacias() -> pd.DataFrame:
-    return pd.DataFrame({"yhat": pd.Series(dtype=float)},
-                        index=pd.DatetimeIndex([], name="fecha"))
-
-
-@dataclass
-class ForecastResult:
-    estado_ejecucion: Literal["ok", "rechazado", "error"] = "rechazado"
-    estado_ajuste: Literal["no_ejecutado", "no_requiere_ajuste"] = "no_ejecutado"
-    metodo: Metodo | None = None
-    corte: int | None = None
-    fecha_corte: pd.Timestamp | None = None
-    horizonte: int | None = None
-    n_observaciones: int = 0
-    predicciones: pd.DataFrame = field(default_factory=_predicciones_vacias)
-    intervalos: pd.DataFrame | None = None
-    parametros: dict[str, int] = field(default_factory=dict)
-    advertencias: tuple[Advertencia, ...] = ()
-    error: ErrorPronostico | None = None
-
-    def __post_init__(self):
-        # Invariante del contrato, tambien para futuros adaptadores con bandas.
-        if self.intervalos is not None and not self.intervalos.index.identical(self.predicciones.index):
-            raise ValueError("Intervalos y predicciones deben compartir el mismo indice temporal")
+# Reexportacion compatible con las importaciones directas de I1.
+from .forecast_result import (
+    Advertencia, ErrorPronostico, ForecastResult, Metodo, METODOS_SARIMA, MIN_OBSERVACIONES,
+)
 
 
 def _es_entero(valor: object) -> bool:
@@ -68,38 +34,49 @@ def _es_entero(valor: object) -> bool:
 
 
 def generar_pronostico(
-    serie: pd.Series, corte: int, horizonte: int, metodo: Metodo,
+    serie: pd.Series, corte: int, horizonte: int, metodo: Metodo, *, alpha: float = 0.05,
 ) -> ForecastResult:
     """Devuelve exactamente horizonte pasos, sin consultar observaciones futuras.
 
     Errores de entrada se devuelven estructurados, en orden: serie, horizonte,
     metodo, serie vacia, corte, indice, valores, suficiencia y fechas futuras.
-    Excepciones operativas previstas del baseline se convierten en errores;
+    alpha se aplica y valida exclusivamente para SARIMA; los baselines conservan
+    intervalos y nivel nominal None. Se exige 0 < alpha < 1 y un nivel 1-alpha
+    representable estrictamente entre 0 y 1. La conversion exacta se comprueba
+    antes de log1p, no implica que log1p preserve distancias entre conteos grandes.
+    Excepciones operativas previstas del metodo se convierten en errores;
     defectos inesperados de programacion se propagan. Los baselines no ajustan
     parametros ni ofrecen intervalos. No hay sustitucion automatica de metodo.
     """
-    salida = ForecastResult()
+    # Solo el contexto local de validacion es mutable. Cada salida se construye
+    # completa y validada; nunca se modifica un ForecastResult ya publicado.
+    contexto = {}
+    estado_ejecucion = "rechazado"
+    estado_ajuste = "no_ejecutado"
 
     def rechazar(codigo, campo, mensaje, **detalles):
-        salida.error = ErrorPronostico(codigo, campo, mensaje, detalles)
-        return salida
+        return ForecastResult(
+            estado_ejecucion=estado_ejecucion, estado_ajuste=estado_ajuste,
+            error=ErrorPronostico(codigo, campo, mensaje, detalles), **contexto,
+        )
 
     if not isinstance(serie, pd.Series):
         return rechazar("SERIE_INVALIDA", "serie", "Se requiere una pd.Series")
     if not _es_entero(horizonte) or horizonte <= 0:
         return rechazar("HORIZONTE_INVALIDO", "horizonte", "Debe ser un entero positivo")
-    salida.horizonte = horizonte = int(horizonte)
-    if not isinstance(metodo, str) or metodo not in ("ultimo_valor", "ingenua_estacional"):
+    contexto["horizonte"] = horizonte = int(horizonte)
+    if not isinstance(metodo, str) or metodo not in MIN_OBSERVACIONES:
         return rechazar("METODO_INVALIDO", "metodo", "Metodo no admitido")
-    salida.metodo = metodo
-    salida.parametros = {"periodo_estacional": 52} if metodo == "ingenua_estacional" else {}
+    contexto["metodo"] = metodo
+    es_sarima = metodo in METODOS_SARIMA
+    contexto["parametros"] = {"periodo_estacional": 52} if metodo == "ingenua_estacional" else {}
     if serie.empty:
         return rechazar("SERIE_VACIA", "serie", "No hay observaciones")
     if not _es_entero(corte) or not 0 <= corte < len(serie):
         return rechazar("CORTE_INVALIDO", "corte", "Debe ser una posicion valida e inclusiva")
-    salida.corte = corte = int(corte)
+    contexto["corte"] = corte = int(corte)
     train = serie.iloc[:corte + 1].copy(deep=True)
-    salida.n_observaciones = len(train)
+    contexto["n_observaciones"] = len(train)
     indice = train.index
     if not isinstance(indice, pd.DatetimeIndex) or indice.tz is not None:
         return rechazar("INDICE_INVALIDO", "serie.index", "Se requiere DatetimeIndex sin zona horaria")
@@ -115,13 +92,32 @@ def generar_pronostico(
             semanal = False
         if not semanal:
             return rechazar("FRECUENCIA_INVALIDA", "serie.index", "B03 pendiente: se requieren pasos de siete dias", posicion=posicion)
-    salida.fecha_corte = indice[-1]
-    salida.advertencias = (Advertencia(
+    contexto["fecha_corte"] = indice[-1]
+    contexto["advertencias"] = (Advertencia(
         "CALENDARIO_PROVISIONAL_B03", "Malla tecnica de siete dias pendiente de definicion definitiva en B03",
     ),)
-    if metodo == "ingenua_estacional":
-        salida.advertencias += (Advertencia(
+    if metodo in ("ingenua_estacional", "sarima_estacional"):
+        contexto["advertencias"] += (Advertencia(
             "PERIODO_ESTACIONAL_HEREDADO_52", "Se reutiliza el periodo existente de 52 observaciones; B03 pendiente",
+        ),)
+    if es_sarima:
+        if isinstance(alpha, (bool, np.bool_)) or not isinstance(alpha, Real):
+            return rechazar("ALPHA_INVALIDO", "alpha", "alpha y 1-alpha deben estar estrictamente entre 0 y 1")
+        try:
+            alpha = float(alpha)
+        except (ValueError, OverflowError):
+            return rechazar("ALPHA_INVALIDO", "alpha", "alpha no representable")
+        if not np.isfinite(alpha) or not 0 < alpha < 1 or not 0 < 1 - alpha < 1:
+            return rechazar("ALPHA_INVALIDO", "alpha", "alpha y 1-alpha deben estar estrictamente entre 0 y 1")
+        contexto["parametros"] = {
+            "order": (1, 1, 1),
+            "seasonal_order": (1, 0, 1, 52) if metodo == "sarima_estacional" else (0, 0, 0, 0),
+            "alpha": alpha, "transformacion": "log1p",
+            "politica_historico": "sarima_min_history_v1",
+            "min_observaciones": MIN_OBSERVACIONES[metodo],
+        }
+        contexto["advertencias"] += (Advertencia(
+            "MINIMO_OPERATIVO_PROVISIONAL", "El minimo historico no garantiza suficiencia estadistica ni convergencia",
         ),)
     valores = []
     for posicion, valor in enumerate(train):
@@ -133,10 +129,22 @@ def generar_pronostico(
             return rechazar("VALORES_INVALIDOS", "serie", "Valor no representable", posicion=posicion)
         if not np.isfinite(numero) or numero < 0:
             return rechazar("VALORES_INVALIDOS", "serie", "Valores finitos y no negativos requeridos", posicion=posicion)
+        if es_sarima:
+            exacto = int(numero) == int(valor) if isinstance(valor, Integral) else numero == valor
+            if not exacto:
+                return rechazar("PRECISION_NUMERICA_NO_ADMITIDA", "serie",
+                                "Conversion a float pierde precision antes del ajuste", posicion=posicion)
         valores.append(numero)
     if metodo == "ingenua_estacional" and len(train) < 52:
         return rechazar("HISTORICO_INSUFICIENTE", "serie", "La ingenua estacional requiere 52 observaciones",
                         requeridas=52, disponibles=len(train))
+    if es_sarima:
+        if len(train) < MIN_OBSERVACIONES[metodo]:
+            return rechazar("HISTORICO_INSUFICIENTE", "serie", "Historico inferior al minimo operativo SARIMA",
+                            requeridas=MIN_OBSERVACIONES[metodo], disponibles=len(train),
+                            metodo=metodo, politica="sarima_min_history_v1")
+        if all(v == valores[0] for v in valores):
+            return rechazar("SERIE_CONSTANTE_NO_ADMITIDA", "serie", "SARIMA no admite historicos exactamente constantes")
     try:
         fechas = pd.date_range(indice[-1] + pd.Timedelta(days=7), periods=horizonte, freq="7D", name="fecha")
     except (ValueError, OverflowError):
@@ -145,14 +153,22 @@ def generar_pronostico(
     # Conversion explicita del prefijo validado: el dtype global puede haber
     # cambiado a object por datos posteriores al corte.
     train = pd.Series(valores, index=indice.copy(), name=train.name, dtype=float)
-    salida.estado_ajuste = "no_requiere_ajuste"
+    if es_sarima:
+        # La frecuencia global puede perderse por fechas posteriores al corte.
+        # Fijar solo metadatos del prefijo ya validado evita avisos dependientes
+        # del futuro. No se generan ni modifican sus fechas o valores.
+        train.index = pd.DatetimeIndex(tuple(train.index), freq="7D", name=train.index.name)
+        # Importacion local: B05/B07 y los baselines no cargan este adaptador.
+        from .sarima_adapter import ejecutar_sarima
+        return ejecutar_sarima(train, fechas, contexto)
+    estado_ajuste = "no_requiere_ajuste"
     try:
         if metodo == "ultimo_valor":
             pred = pronosticar_ultimo_valor(train, horizonte)
         else:
             pred = pronosticar_ingenua_estacional(train, horizonte, m=52)
     except (ValueError, RuntimeError, FloatingPointError, OverflowError) as exc:
-        salida.estado_ejecucion = "error"
+        estado_ejecucion = "error"
         return rechazar("FALLO_PRONOSTICO", "metodo", "El baseline no pudo generar el pronostico",
                         tipo_excepcion=type(exc).__name__, motivo=str(exc))
 
@@ -166,8 +182,9 @@ def generar_pronostico(
         except (ValueError, OverflowError):
             valida = False
     if not valida:
-        salida.estado_ejecucion = "error"
+        estado_ejecucion = "error"
         return rechazar("SALIDA_INVALIDA", "predicciones", "Salida incompatible con horizonte, fechas o valores")
-    salida.predicciones = pd.DataFrame({"yhat": valores_pred}, index=fechas)
-    salida.estado_ejecucion = "ok"
-    return salida
+    return ForecastResult(
+        estado_ejecucion="ok", estado_ajuste=estado_ajuste,
+        predicciones=pd.DataFrame({"yhat": valores_pred}, index=fechas), **contexto,
+    )

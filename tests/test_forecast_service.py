@@ -1,5 +1,5 @@
 """Aceptacion B06-I1: casos 1-35 del contrato, agrupados y parametrizados."""
-from dataclasses import fields
+from collections.abc import Mapping
 
 import numpy as np
 import pandas as pd
@@ -21,8 +21,11 @@ def serie(n=120):
 
 
 def iguales(a, b):
-    for campo in fields(ForecastResult):
-        x, y = getattr(a, campo.name), getattr(b, campo.name)
+    # Comparar el contrato publico, no los detalles privados de almacenamiento.
+    for nombre in ("estado_ejecucion", "estado_ajuste", "metodo", "corte", "fecha_corte",
+                   "horizonte", "n_observaciones", "predicciones", "intervalos",
+                   "parametros", "advertencias", "error", "diagnostico_ajuste", "nivel_intervalo"):
+        x, y = getattr(a, nombre), getattr(b, nombre)
         if isinstance(x, pd.DataFrame):
             pd.testing.assert_frame_equal(x, y)
         else:
@@ -34,7 +37,7 @@ def rechazado(resultado, codigo):
     assert resultado.estado_ajuste == "no_ejecutado"
     assert resultado.error.codigo == codigo
     assert resultado.error.campo and resultado.error.mensaje
-    assert isinstance(resultado.error.detalles, dict)
+    assert isinstance(resultado.error.detalles, Mapping)
     assert resultado.predicciones.empty
     assert list(resultado.predicciones) == ["yhat"]
     assert resultado.predicciones.index.name == "fecha"
@@ -277,8 +280,40 @@ def test_no_muta_entrada(metodo, invalida):
 
 def test_intervalos_comparten_indice():
     r = generar_pronostico(serie(), 79, 8, "ultimo_valor")
-    bandas = pd.DataFrame({"lo": np.zeros(8), "hi": np.ones(8)}, index=r.predicciones.index.copy())
-    ForecastResult(predicciones=r.predicciones, intervalos=bandas)
+    bandas = pd.DataFrame({"lo": np.full(8, 78.), "hi": np.full(8, 80.)}, index=r.predicciones.index.copy())
+    datos = dict(estado_ejecucion="ok", estado_ajuste="no_requiere_ajuste",
+                 metodo=r.metodo, corte=r.corte, fecha_corte=r.fecha_corte,
+                 horizonte=r.horizonte, n_observaciones=r.n_observaciones,
+                 predicciones=r.predicciones)
+    ForecastResult(**datos, intervalos=bandas)
     bandas.index = bandas.index + pd.Timedelta(days=1)
     with pytest.raises(ValueError, match="mismo indice temporal"):
-        ForecastResult(predicciones=r.predicciones, intervalos=bandas)
+        ForecastResult(**datos, intervalos=bandas)
+
+
+def test_importaciones_publicas_compatibles():
+    from episentinel import services
+    from episentinel.services import forecast_result
+
+    for nombre in ("ForecastResult", "ErrorPronostico", "Advertencia"):
+        assert getattr(services, nombre) is getattr(servicio, nombre)
+        assert getattr(servicio, nombre) is getattr(forecast_result, nombre)
+    assert services.generar_pronostico is servicio.generar_pronostico
+
+
+@pytest.mark.parametrize("metodo", METODOS)
+def test_baselines_no_adquieren_intervalos_ni_diagnostico_sarima(metodo):
+    r = generar_pronostico(serie(), 79, 8, metodo)
+    assert r.intervalos is None
+    assert r.nivel_intervalo is None and r.diagnostico_ajuste is None
+    iguales(r, generar_pronostico(serie(), 79, 8, metodo, alpha=0.1))
+
+
+@pytest.mark.parametrize("metodo", METODOS)
+def test_mutar_vista_no_cambia_pronostico(metodo):
+    r = generar_pronostico(serie(), 79, 8, metodo)
+    esperado = r.predicciones
+    vista = r.predicciones
+    vista.iloc[0, 0] = -999
+    vista.index = vista.index + pd.Timedelta(days=7)
+    pd.testing.assert_frame_equal(r.predicciones, esperado)
