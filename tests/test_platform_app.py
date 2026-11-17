@@ -54,6 +54,7 @@ def test_five_views_without_implicit_training(artifacts, monkeypatch, view, plot
     prohibit_models(monkeypatch)
     page = app()
     page.radio(key="epi_platform_nav").set_value(LAB).run()
+    page.radio(key="epi_lab_mode_widget").set_value("Vistas históricas").run()
     page.radio(key="epi_lab_view").set_value(view).run()
     assert not page.exception
     assert len(page.get("plotly_chart")) == plots
@@ -64,6 +65,7 @@ def test_missing_panel_does_not_hide_saved_comparison_or_observatory(artifacts):
     (artifacts / "data/processed/panel_casos.parquet").unlink()
     page = app()
     page.radio(key="epi_platform_nav").set_value(LAB).run()
+    page.radio(key="epi_lab_mode_widget").set_value("Vistas históricas").run()
     assert page.warning and not page.exception
     page.radio(key="epi_lab_view").set_value("Evidencia").run()
     assert not page.exception and len(page.get("plotly_chart")) == 1
@@ -79,6 +81,7 @@ def test_missing_comparison_and_lookup_are_explicit(artifacts):
     (artifacts / "data/processed/municipios.csv").unlink()
     page = app()
     page.radio(key="epi_platform_nav").set_value(LAB).run()
+    page.radio(key="epi_lab_mode_widget").set_value("Vistas históricas").run()
     assert not page.exception and len(page.get("plotly_chart")) == 2
     page.radio(key="epi_lab_view").set_value("Evidencia").run()
     assert not page.exception and not page.get("plotly_chart")
@@ -99,6 +102,7 @@ def test_observatory_result_survives_all_destinations(artifacts, monkeypatch):
     page.radio(key="epi_nav").set_value("Analizar datos").run()
     assert len(page.get("plotly_chart")) == 1
     page.radio(key="epi_platform_nav").set_value(LAB).run()
+    page.radio(key="epi_lab_mode_widget").set_value("Vistas históricas").run()
     page.radio(key="epi_lab_view").set_value("Señales de alerta").run()
     page.radio(key="epi_platform_nav").set_value(EVIDENCE).run()
     assert not page.exception and page.session_state.epi_work["execution_key"] == key
@@ -113,8 +117,9 @@ def test_forecast_requires_click_and_configuration_change_hides_old_result(artif
     prohibit_models(monkeypatch)
     page = app()
     page.radio(key="epi_platform_nav").set_value(LAB).run()
+    page.radio(key="epi_lab_mode_widget").set_value("Vistas históricas").run()
     page.radio(key="epi_lab_view").set_value("Pronósticos").run()
-    page.radio[2].set_value("Último valor").run()
+    next(r for r in page.radio if r.label == "Modelo").set_value("Último valor").run()
     assert not page.get("plotly_chart")
     next(b for b in page.button if b.label == "Calcular pronóstico histórico").click().run()
     assert not page.exception and len(page.get("plotly_chart")) == 1
@@ -123,7 +128,7 @@ def test_forecast_requires_click_and_configuration_change_hides_old_result(artif
     page.radio(key="epi_lab_view").set_value("Pronósticos").run()
     # The model widget resets when unmounted: a different request cannot show saved results.
     assert not page.exception and not page.get("plotly_chart")
-    page.radio[2].set_value("Último valor").run()
+    next(r for r in page.radio if r.label == "Modelo").set_value("Último valor").run()
     assert len(page.get("plotly_chart")) == 1
     pd.testing.assert_frame_equal(saved, page.session_state.epi_lab_forecast[1])
     page.slider[0].set_value(12).run()

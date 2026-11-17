@@ -1,4 +1,4 @@
-"""Unified Platform I1. No historical model is executed on navigation."""
+"""Unified Platform I2. No historical model is executed on navigation."""
 from pathlib import Path
 import sys
 
@@ -10,7 +10,8 @@ import streamlit as st
 from app.analysis_app import main as render_observatory
 from app.analysis_components import section, render_evidence
 from app.analysis_presenter import ensure_current, make_config, read_profiles
-from app.historical_app import VIEWS, render as render_historical, render_comparison, render_notice
+from app.historical_app import render_comparison, render_notice
+from app.lab_app import render as render_lab
 
 DESTINATIONS = ("Observatorio Epidemiológico", "Laboratorio de Machine Learning", "Evidencia y metodología")
 DOCUMENTS = (
@@ -24,6 +25,7 @@ DOCUMENTS = (
     ("Decisiones técnicas históricas", "docs/DECISIONES_TECNICAS.md"),
     ("Estado histórico del proyecto", "docs/ESTADO_DEL_PROYECTO.md"),
     ("Plataforma I1", "docs/PLATAFORMA_I1.md"),
+    ("Laboratorio de doce fases · I2", "docs/PLATAFORMA_I2.md"),
 )
 
 
@@ -50,14 +52,12 @@ def session_evidence():
 def main():
     st.set_page_config(page_title="EpiSentinel AI · Plataforma", page_icon="◈", layout="wide", initial_sidebar_state="collapsed")
     st.markdown((ROOT / "app/analysis_styles.css").read_text(encoding="utf-8"), unsafe_allow_html=True)
-    st.markdown('<div class="epi-brand"><span class="epi-mark">E</span><div>EpiSentinel <b>AI</b><small>VIGILANCIA CON EVIDENCIA</small></div><span class="epi-academic">PLATAFORMA I1 · ACADÉMICA</span></div>', unsafe_allow_html=True)
+    st.markdown('<div class="epi-brand"><span class="epi-mark">E</span><div>EpiSentinel <b>AI</b><small>VIGILANCIA CON EVIDENCIA</small></div><span class="epi-academic">PLATAFORMA I2 · ACADÉMICA</span></div>', unsafe_allow_html=True)
     destination = st.radio("Ambiente de trabajo", DESTINATIONS, horizontal=True, key="epi_platform_nav", label_visibility="collapsed")
     if destination == DESTINATIONS[0]:
         render_observatory(embedded=True)
     elif destination == DESTINATIONS[1]:
-        section("LABORATORIO / HISTÓRICO", "Laboratorio de Machine Learning", "Explora los análisis y experimentos previos. El recorrido de doce fases corresponde a Plataforma I2.")
-        view = st.radio("Recorrido histórico", VIEWS, horizontal=True, key="epi_lab_view")
-        render_historical(view)
+        render_lab()
     else:
         section("TRANSPARENCIA", "Evidencia y metodología", "Consulta por separado la ejecución de la sesión, los resultados históricos y sus contratos.")
         source = st.radio("Fuente de evidencia", ("Sesión del Observatorio", "Resultados históricos", "Metodología y contratos"), horizontal=True, key="epi_evidence_source")
