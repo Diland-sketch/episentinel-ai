@@ -1,0 +1,93 @@
+{
+  "schema": "episentinel-synthetic-benchmark-v1",
+  "synthetic": true,
+  "created_utc": "2026-11-17T23:25:07.525520+00:00",
+  "environment": {
+    "python": "3.13.4",
+    "platform": "Windows-11-10.0.26300-SP0",
+    "processor": "Intel64 Family 6 Model 154 Stepping 4, GenuineIntel",
+    "episentinel": "0.1.0",
+    "code_sha256": {
+      "scripts/benchmark_demo.py": "fb2f0baca5d71afface8ececb7a51a37ca7d42046f4ceed96a7f8cc14f745b63",
+      "src/episentinel/data/csv_contract.py": "cd872bd34bdd8ca1cbc19feae3582eac8f2faf3ff485e821b53561952714eb99",
+      "src/episentinel/data/csv_loader.py": "8890532d4cd2889adcdea78c730317a19224e04830510e317e779f43a368a485",
+      "src/episentinel/data/epidemiological_series.py": "182ecc66794cba0c9a4a077d9e19292c3ef797400aad911f799f86e5807f111a",
+      "src/episentinel/services/isolated_pipeline.py": "6e2009a2874780ba8426aafb48346d6720f5e3e0883f41842c4b4cd1f32df473"
+    }
+  },
+  "limits": {
+    "max_rows": 100000,
+    "max_csv_bytes": 8388608,
+    "worker_timeout_s": 30,
+    "total_budget_s": 120,
+    "memory_hard_limit": null
+  },
+  "methodology": {
+    "dataset": "Deterministic artificial municipal codes, 832 technical positions, event 210, count=i%29; zeros included. No real observations.",
+    "timing": "B05 end-to-end with wrappers forwarding unchanged calls. CSV syntax/hash/read inside B04; validation_s=B04 total minus ingestion; construction_s=build_series. Orchestration/deepcopy overhead remains in B05 total.",
+    "memory": "tracemalloc Python allocations including synthetic generation, grid and pipeline; excludes interpreter startup and native/RSS allocations. Instrumented times, not uninstrumented throughput.",
+    "scope": "B03 validates all delivered rows and builds only explicitly selected 50001/210; not all municipalities. No file I/O timing (payload in memory), no model calls or network, no extrapolation."
+  },
+  "results": [
+    {
+      "rows": 1000,
+      "repeat": 1,
+      "csv_bytes": 20504,
+      "csv_sha256": "053e7a05fbcb9983c4df2a18108ddc1de6a868cf1381c2fae96edce7588bcc1c",
+      "municipal_candidates": 2,
+      "selected_series": "50001/210",
+      "status": "completed",
+      "pipeline_s": 0.07625889999326319,
+      "ingestion_s": 0.013516799954231828,
+      "validation_s": 0.026794200064614415,
+      "construction_s": 0.019935299991630018,
+      "b04_total_s": 0.040311000018846244,
+      "python_peak_mib": 1.3465080261230469,
+      "rss_peak_mib": null,
+      "observed_selected": 832,
+      "expected_selected": 832,
+      "errors": [],
+      "warnings": 6
+    },
+    {
+      "rows": 10000,
+      "repeat": 1,
+      "csv_bytes": 204847,
+      "csv_sha256": "92d5a73d2ba9e0ee3a6427ef55b45669ef6dea31a5ce59dc52042c0cb7cfb0f0",
+      "municipal_candidates": 13,
+      "selected_series": "50001/210",
+      "status": "completed",
+      "pipeline_s": 0.6616515000350773,
+      "ingestion_s": 0.14590299996780232,
+      "validation_s": 0.24427720002131537,
+      "construction_s": 0.13586169999325648,
+      "b04_total_s": 0.3901801999891177,
+      "python_peak_mib": 9.798008918762207,
+      "rss_peak_mib": null,
+      "observed_selected": 832,
+      "expected_selected": 832,
+      "errors": [],
+      "warnings": 6
+    },
+    {
+      "rows": 50000,
+      "repeat": 1,
+      "csv_bytes": 1024132,
+      "csv_sha256": "ec926866338971cceaab133f517dcd80606ba11fdc663fb01729f5648982a06a",
+      "municipal_candidates": 61,
+      "selected_series": "50001/210",
+      "status": "completed",
+      "pipeline_s": 3.548888999968767,
+      "ingestion_s": 0.7511004999978468,
+      "validation_s": 1.4344633999862708,
+      "construction_s": 0.7002003000234254,
+      "b04_total_s": 2.1855638999841176,
+      "python_peak_mib": 49.82504367828369,
+      "rss_peak_mib": null,
+      "observed_selected": 832,
+      "expected_selected": 832,
+      "errors": [],
+      "warnings": 6
+    }
+  ]
+}
