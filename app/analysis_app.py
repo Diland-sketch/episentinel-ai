@@ -7,6 +7,9 @@ sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "src"))
 
 import streamlit as st
+from app.session_input import (CSV_MODE, MANUAL_MODE, new_inputs, observe_work, change_csv,
+                               change_mode, combine, clear_active)
+from app.input_components import render_manual, render_counters, render_partition_context
 
 from app.analysis_components import (hero, progress, render_evidence, render_result, section,
                                      credibility_band, panel_heading)
@@ -25,6 +28,10 @@ def main(embedded=False):
     if "epi_work" not in st.session_state:
         st.session_state.epi_work = new_state()
     state = st.session_state.epi_work
+    if "epi_inputs" not in st.session_state:
+        st.session_state.epi_inputs = new_inputs()
+    inputs = st.session_state.epi_inputs
+    observe_work(inputs, state)
     try:
         profiles = read_profiles(ROOT / "configs/ui_period_grids.json")
         profile_error = None
@@ -38,16 +45,53 @@ def main(embedded=False):
         if step:
             state["step"] = step
 
+    def reset_selection():
+        for key in ("epi_mun", "epi_event", "epi_profile"):
+            st.session_state.pop(key, None)
+
     def upload_changed():
         upload = st.session_state.epi_upload
-        if set_source(state, None if upload is None else upload.getvalue(), None if upload is None else upload.name):
-            for key in ("epi_mun", "epi_event", "epi_profile"):
-                st.session_state.pop(key, None)
+        if change_csv(inputs, state, None if upload is None else upload.getvalue(), None if upload is None else upload.name):
+            reset_selection()
+            st.session_state.pop("epi_manual_include", None)
 
     def remove_source():
-        set_source(state, None, None)
-        for key in ("epi_upload", "epi_mun", "epi_event", "epi_profile"):
+        clear_active(inputs, state)
+        reset_selection()
+        st.session_state.pop("epi_upload", None)
+        st.session_state.pop("epi_manual_include", None)
+
+    def entry_changed():
+        change_mode(inputs, state, st.session_state.epi_entry_mode)
+        reset_selection()
+        st.session_state.epi_manual_include = inputs["include_csv"]
+
+    def combined_changed():
+        if combine(inputs, state, st.session_state.epi_manual_include):
+            reset_selection()
+        st.session_state.epi_manual_include = inputs["include_csv"]
+
+    def restart_observatory():
+        state.clear()
+        state.update(new_state())
+        inputs.clear()
+        inputs.update(new_inputs())
+        for key in ("epi_upload", "epi_entry_mode", "epi_manual_include", "epi_mun", "epi_event", "epi_profile",
+                    "epi_manual_mun", "epi_manual_event", "epi_manual_year", "epi_manual_week", "epi_manual_count"):
             st.session_state.pop(key, None)
+        st.session_state.epi_nav = "Analizar datos"
+
+    def open_retrospective():
+        st.session_state.epi_platform_nav = "Laboratorio de Machine Learning"
+        st.session_state.epi_lab_mode = "Demostración aplicada"
+        st.session_state.epi_lab_mode_widget = "Demostración aplicada"
+        st.session_state.epi_demo_section = "Pronóstico retrospectivo"
+
+    def open_planner():
+        st.session_state.epi_platform_nav = "Laboratorio de Machine Learning"
+        st.session_state.epi_lab_mode = "Demostración aplicada"
+        st.session_state.epi_lab_mode_widget = "Demostración aplicada"
+        st.session_state.epi_demo_section = "Diseño temporal"
 
     def selection_changed(field, key):
         set_selection(state, field, st.session_state[key])
@@ -75,9 +119,13 @@ def main(embedded=False):
     st.markdown('<div class="epi-rule"></div>', unsafe_allow_html=True)
     if nav == "Inicio":
         hero()
-        st.button("Comenzar análisis", type="primary", on_click=go, kwargs=dict(nav="Analizar datos", step="Datos"))
+        start, forecast = st.columns(2)
+        start.button("Comenzar análisis", type="primary", on_click=go, kwargs=dict(nav="Analizar datos", step="Datos"))
+        if embedded:
+            forecast.button("Abrir pronóstico retrospectivo", on_click=open_retrospective,
+                            help="Experimento histórico independiente del conjunto del Observatorio; entrar no entrena.")
         section("DE LOS REGISTROS A SU CONTEXTO", "Un recorrido claro para preguntas importantes.",
-                "Carga tus observaciones, elige un municipio y explora su evolución con la calidad y las limitaciones a la vista.")
+                "Carga un CSV o registra conteos manuales, elige un municipio y explora su evolución con la calidad y las limitaciones a la vista.")
         credibility_band()
         with st.container(border=True, key="epi_method_panel"):
             panel_heading("UN RECORRIDO CON FUNDAMENTO", "La evidencia no es un anexo.",
@@ -98,36 +146,57 @@ def main(embedded=False):
     else:
         progress(state["step"])
         if state["step"] == "Datos":
-            section("01 / DATOS", "Empieza por una fuente clara.", "Carga un CSV canónico. Validaremos su estructura antes de permitir el análisis.")
+            section("01 / DATOS", "Empieza por una fuente clara.", "Carga un CSV o registra observaciones manuales. Ambos usan el contrato canónico B04.")
+            if "epi_entry_mode" not in st.session_state:
+                st.session_state.epi_entry_mode = inputs["mode"]
+            st.radio("Método de ingreso", (CSV_MODE, MANUAL_MODE), horizontal=True,
+                     key="epi_entry_mode", on_change=entry_changed)
+            st.caption("Cambiar de fuente invalida la lectura anterior. CSV y manual no se mezclan automáticamente.")
             with st.container(border=True, key="epi_upload_panel"):
-                panel_heading("01", "Una fuente. Un punto de partida verificable.", "El archivo se revisa antes de construir cualquier serie. Su identidad y diagnóstico acompañarán toda la lectura.")
-                st.file_uploader("Archivo CSV canónico", type=["csv"], key="epi_upload", on_change=upload_changed,
-                                 help="UTF-8 y cinco columnas: cod_mun, ano, semana, cod_eve, conteo.")
-                st.download_button("Descargar plantilla de encabezados", "cod_mun,ano,semana,cod_eve,conteo\n".encode(), "plantilla_episentinel.csv", "text/csv")
-                st.caption("La plantilla no contiene observaciones. El archivo cargado se conserva solo en esta sesión al navegar.")
-                demo = ROOT / "data/processed/b08_demo.csv"
-                with st.expander("Demostración con observaciones reales"):
-                    st.write("Derivación local trazable: Cali, eventos 210 y 220, tres periodos documentados. No contiene conteos simulados ni un calendario oficial.")
-                    if demo.exists():
-                        st.download_button("Descargar CSV real de demostración", demo.read_bytes(), "b08_demo.csv", "text/csv")
-                        st.caption("Descarga este archivo y selecciónalo en el control de carga. Licencia de datos de referencia: CC BY-SA 4.0; transformaciones documentadas en DEMO_B08.md.")
+                if inputs["mode"] == CSV_MODE:
+                    st.file_uploader("Archivo CSV canónico", type=["csv"], key="epi_upload", on_change=upload_changed,
+                                     help="UTF-8 y cinco columnas: cod_mun, ano, semana, cod_eve, conteo.")
+                    st.download_button("Descargar plantilla de encabezados", "cod_mun,ano,semana,cod_eve,conteo\n".encode(), "plantilla_episentinel.csv", "text/csv")
+                    st.caption("La plantilla no contiene observaciones. El archivo cargado se conserva solo en esta sesión al navegar.")
+                    demo = ROOT / "data/processed/b08_demo.csv"
+                    with st.expander("Demostración con observaciones reales"):
+                        st.write("Derivación local trazable: Cali, eventos 210 y 220, tres periodos documentados. No contiene conteos simulados ni un calendario oficial.")
+                        if demo.exists():
+                            st.download_button("Descargar CSV real de demostración", demo.read_bytes(), "b08_demo.csv", "text/csv")
+                            st.caption("Descarga este archivo y selecciónalo en el control de carga. Licencia de datos de referencia: CC BY-SA 4.0; transformaciones documentadas en DEMO_B08.md.")
+                        else:
+                            st.info("El archivo real de demostración aún no está preparado en esta instalación. Consulta docs/DEMO_B08.md.")
+                    if inputs["manual_rows"]:
+                        st.caption(f"{len(inputs['manual_rows'])} registros manuales conservados en memoria, fuera del conjunto CSV activo.")
+                else:
+                    csv_ready = inputs["csv_load"] is not None and not inputs["csv_load"].blocked
+                    if "epi_manual_include" not in st.session_state:
+                        st.session_state.epi_manual_include = inputs["include_csv"]
+                    st.checkbox("Combinar explícitamente con el CSV aceptado", key="epi_manual_include",
+                                disabled=not csv_ready, on_change=combined_changed,
+                                help="Revalida todas las claves CSV + manuales con B04; se rechaza cualquier duplicado o conflicto.")
+                    if inputs["include_csv"]:
+                        st.info("Conjunto combinado autorizado: CSV validado + registros manuales. El conjunto completo se revalida al agregar.")
                     else:
-                        st.info("El archivo real de demostración aún no está preparado en esta instalación. Consulta docs/DEMO_B08.md.")
+                        st.caption("Solo registros manuales; ningún archivo ni registro histórico se suma al conjunto.")
+                    render_manual(inputs, state, reset_selection)
                 loaded = state["load"]
                 if state["error"]:
                     st.error("No se pudo leer el archivo. Intenta cargarlo de nuevo.")
                 if loaded:
-                    st.write("**Archivo actual:**", state["filename"])
+                    st.write("**Archivo actual:**" if inputs["mode"] == CSV_MODE else "**Fuente lógica en memoria:**", state["filename"])
                     if loaded.blocked:
                         st.error("Hay problemas que corregir. El archivo no puede pasar al análisis.")
                         st.dataframe(issue_rows(loaded.report), hide_index=True, width="stretch")
                         with st.expander("Diagnóstico técnico original"):
                             st.json(loaded.report)
                     else:
-                        st.success("Archivo aceptado. Puedes seleccionar territorio y evento.")
+                        st.success("Archivo aceptado. Puedes seleccionar territorio y evento." if inputs["mode"] == CSV_MODE else "Conjunto manual aceptado por B04. Puedes seleccionar territorio y evento.")
                         st.button("Continuar a territorio", type="primary", on_click=go, kwargs=dict(step="Territorio"))
-                    st.button("Retirar archivo", on_click=remove_source)
+                    st.button("Retirar archivo" if inputs["mode"] == CSV_MODE else "Vaciar registros manuales", on_click=remove_source)
+            render_counters(inputs, state)
         elif state["step"] == "Territorio":
+            render_counters(inputs, state)
             loaded = state["load"]
             if not loaded or loaded.blocked:
                 st.warning("Primero necesitas un archivo aceptado.")
@@ -182,11 +251,17 @@ def main(embedded=False):
                     st.error(state["error"])
                 st.button("Volver a datos", on_click=go, kwargs=dict(step="Datos"))
         else:
+            render_counters(inputs, state)
             if state["result"] is None:
                 st.info("No hay resultados vigentes. Completa la configuración y vuelve a ejecutar.")
             else:
                 render_result(state["result"])
-            st.button("Cambiar configuración", on_click=go, kwargs=dict(step="Territorio"))
+            config_action, source_action = st.columns(2)
+            config_action.button("Cambiar configuración", on_click=go, kwargs=dict(step="Territorio"))
+            source_action.button("Cambiar fuente o agregar registros", on_click=go, kwargs=dict(step="Datos"))
+    if nav != "Inicio":
+        render_partition_context(inputs, state, open_planner if embedded else None)
+        st.button("Nueva sesión del Observatorio", on_click=restart_observatory, key="epi_new_observatory")
     st.markdown('<footer class="epi-footer"><strong>EpiSentinel AI</strong><span>Equipo DKK · Prototipo académico</span><span>Observaciones con contexto. Límites siempre visibles.</span></footer>', unsafe_allow_html=True)
 
 
