@@ -147,7 +147,7 @@ def test_premium_chart_preserves_values_and_has_no_forecast_trace():
     state, config = prepared()
     series = execute(state, config).series.series[0]
     figure = observed_figure(series)
-    assert figure.layout.height >= 500
+    assert 280 <= figure.layout.height <= 340
     assert list(figure.data[0].y) == [0, None, None]
     assert not figure.data[0].connectgaps
     assert {trace.name for trace in figure.data} == {"Conteo observado", "Sin observación"}

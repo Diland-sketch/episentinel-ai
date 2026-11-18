@@ -134,20 +134,20 @@ def render_journey():
     context = cached_context(str(root), evidence_signature(root))
     statuses = {phase.number: phase_status(phase, context) for phase in PHASES}
     complete = sum(value == "Completo con evidencia" for value in statuses.values())
-    st.markdown(f'<section class="epi-lab-hero"><div class="epi-eyebrow">LABORATORIO / RECORRIDO CIENTÍFICO</div><h1>Doce fases.<br><em>Una cadena de evidencia.</em></h1><p>Del problema al despliegue: explora las decisiones, los resultados disponibles y las preguntas que siguen abiertas.</p><div class="epi-lab-scope">12 fases documentadas · {complete} completa con evidencia local · {sum(v == "Parcial" for v in statuses.values())} parciales · 1 pendiente</div></section>', unsafe_allow_html=True)
+    st.markdown(f'<section class="epi-lab-hero"><div class="epi-eyebrow">LABORATORIO / RECORRIDO CIENTÍFICO</div><h1>Doce fases. <em>Evidencia a la vista.</em></h1><p>Del problema al despliegue: explora las decisiones, los resultados disponibles y las preguntas que siguen abiertas.</p><div class="epi-lab-scope">12 fases documentadas · {complete} completa con evidencia local · {sum(v == "Parcial" for v in statuses.values())} parciales · 1 pendiente</div></section>', unsafe_allow_html=True)
     st.caption("Este recorrido describe experimentos del proyecto, no la carga actual del Observatorio. Documentar las doce fases no significa haber completado las doce.")
-    cards = ''.join(f'<article><span>0{number}</span><strong>{escape(title)}</strong><small>{sum(p.chapter == number for p in PHASES)} fases · {escape(body)}</small></article>' for number, (title, body) in CHAPTERS.items())
-    st.markdown('<div class="epi-lab-chapters">' + cards + '</div>', unsafe_allow_html=True)
     if "epi_science_chapter_widget" not in st.session_state:
         st.session_state.epi_science_chapter_widget = st.session_state.get("epi_science_chapter", 1)
-    chapter = st.radio("Capítulo científico", list(CHAPTERS), format_func=lambda n: f"{n}. {CHAPTERS[n][0]}",
-                       horizontal=True, key="epi_science_chapter_widget", on_change=chapter_changed)
+    with st.container(key="epi_chapter_nav"):
+        chapter = st.radio("Capítulo científico", list(CHAPTERS), format_func=lambda n: f"{n}. {CHAPTERS[n][0]}",
+                           horizontal=True, key="epi_science_chapter_widget", on_change=chapter_changed)
     options = [p.number for p in PHASES if p.chapter == chapter]
     key = f"epi_science_phase_widget_{chapter}"
     if key not in st.session_state:
         st.session_state[key] = st.session_state.get("epi_science_choices", {}).get(chapter, options[0])
-    number = st.radio("Fase del capítulo", options, format_func=lambda n: f"{n:02d} · {PHASES[n-1].title}",
-                      horizontal=True, key=key, on_change=phase_changed, args=(chapter,))
+    with st.container(key="epi_phase_nav"):
+        number = st.radio("Fase del capítulo", options, format_func=lambda n: f"{n:02d} · {PHASES[n-1].title}",
+                          horizontal=True, key=key, on_change=phase_changed, args=(chapter,))
     phase = PHASES[number - 1]
     status = statuses[number]
     st.markdown(f'<section class="epi-lab-phase"><div><span class="epi-eyebrow">FASE {number:02d} / 12</span><h2>{escape(phase.title)}</h2><p>{escape(phase.objective)}</p></div><span class="epi-lab-badge {status_class(status)}">{escape(status)}</span></section>', unsafe_allow_html=True)
@@ -182,12 +182,14 @@ def render_journey():
 def render():
     if "epi_lab_mode_widget" not in st.session_state:
         st.session_state.epi_lab_mode_widget = st.session_state.get("epi_lab_mode", "Recorrido científico")
-    mode = st.radio("Explorar el Laboratorio", ("Recorrido científico", "Vistas históricas"), horizontal=True,
-                    key="epi_lab_mode_widget", on_change=mode_changed)
+    with st.container(key="epi_secondary_nav"):
+        mode = st.radio("Explorar el Laboratorio", ("Recorrido científico", "Vistas históricas"), horizontal=True,
+                        key="epi_lab_mode_widget", on_change=mode_changed)
     if mode == "Recorrido científico":
         render_journey()
     else:
-        st.markdown("## Laboratorio de Machine Learning · Vistas históricas")
+        st.markdown("## Archivo de experimentos históricos")
         st.caption("Las cinco vistas originales permanecen disponibles. Vuelve al recorrido científico para revisar su trazabilidad.")
-        view = st.radio("Recorrido histórico", historical.VIEWS, horizontal=True, key="epi_lab_view")
+        with st.container(key="epi_history_nav"):
+            view = st.radio("Recorrido histórico", historical.VIEWS, horizontal=True, key="epi_lab_view")
         historical.render(view)

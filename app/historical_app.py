@@ -8,6 +8,8 @@ import pandas as pd
 import plotly.graph_objects as go
 import streamlit as st
 
+from app.visual_theme import style_figure, heatmap_labels
+
 from episentinel.baselines.ingenua_estacional import pronosticar_ingenua_estacional, pronosticar_ultimo_valor
 from episentinel.detection.alertas import tabla_alertas
 from episentinel.evaluation.forecast_metrics import mae, mase, rmse
@@ -92,7 +94,7 @@ def render_comparison():
             fig.add_trace(go.Bar(x=g["Serie"], y=g["mase"], name=modelo_n, marker_color=color_modelo.get(modelo_n, GRIS)))
         fig.update_layout(barmode="group", height=420, yaxis_title="MASE (menor es mejor)", legend=dict(orientation="h", y=1.12),
                           title="Error escalado (MASE) por serie y modelo")
-        st.plotly_chart(fig, width="stretch", theme=None, config={"displaylogo": False})
+        st.plotly_chart(style_figure(fig), width="stretch", theme=None, config={"displaylogo": False})
         promedio = comparacion.groupby("Modelo")["mase"].mean().sort_values()
         insight("RESULTADO PRELIMINAR", f"{promedio.index[0]} obtiene el menor MASE promedio ({promedio.iloc[0]:.3f}) entre las {comparacion['serie'].nunique()} series evaluadas. Una sola ventana no demuestra qué método será mejor en otros periodos o territorios.")
         prom = comparacion.groupby("Modelo", sort=False)["mase"].mean().round(3).rename("MASE promedio").to_frame()
@@ -136,27 +138,24 @@ def render(pagina="Panorama"):
         return "Total nacional (sin Exterior)" if tipo.startswith("Nacional") else (f"Departamento: {clave}" if tipo == "Departamento" else clave)
 
 
-    st.markdown("**Territorio del experimento histórico**")
-    tipo = st.selectbox("Nivel territorial", ["Nacional (solo Colombia)", "Departamento", "Municipio"], key="epi_lab_level")
+    filters = st.columns([1, 2], gap="medium")
+    tipo = filters[0].selectbox("Nivel territorial", ["Nacional (solo Colombia)", "Departamento", "Municipio"], key="epi_lab_level")
     if tipo == "Departamento":
         deps = sorted(nombres.loc[~ES_EXTERIOR, "departamento"].unique())
-        clave = st.selectbox("Departamento", deps, index=deps.index("Valle") if "Valle" in deps else 0, key="epi_lab_department")
+        clave = filters[1].selectbox("Departamento", deps, index=deps.index("Valle") if "Valle" in deps else 0, key="epi_lab_department")
     elif tipo == "Municipio":
         totales = panel.sum(axis=1)
         candidatos = totales[~ES_EXTERIOR].sort_values(ascending=False).index
         etiquetas = {c: f"{nombres.loc[c, 'municipio']} ({nombres.loc[c, 'departamento']}) · {c}" for c in candidatos}
-        cod = st.selectbox("Municipio (ordenados por casos totales)", list(candidatos), format_func=lambda c: etiquetas[c], key="epi_lab_municipality")
+        cod = filters[1].selectbox("Municipio (ordenados por casos totales)", list(candidatos), format_func=lambda c: etiquetas[c], key="epi_lab_municipality")
         clave = cod
     else:
         clave = "Nacional"
     serie = serie_de(tipo, clave)
     nombre_serie = titulo_de(tipo, clave) if tipo != "Municipio" else etiquetas[clave]
-    st.divider()
-    st.markdown(
-        f"**Datos:** SIVIGILA (INS), dengue 210+220\n\n**Periodo:** {FECHAS[0].year}–{FECHAS[-1].year}\n\n"
-        f"**Partición:** entrenamiento 2007–2020 · validación 2021 · prueba 2022")
-
-    st.caption(f"Serie histórica: {nombre_serie} · SIVIGILA · 2007–2022")
+    st.caption(f"{nombre_serie} · SIVIGILA / INS · dengue 210+220 · {FECHAS[0].year}–{FECHAS[-1].year}")
+    with st.expander("Contexto temporal del experimento"):
+        st.write("Entrenamiento 2007–2020 · validación 2021 · prueba 2022. Malla histórica por bloques de 52 semanas; no calendario epidemiológico oficial.")
 
 
     def sombreado(fig, y_max):
@@ -183,12 +182,12 @@ def render(pagina="Panorama"):
         for txt, x in [("Entrenamiento", FECHAS[360]), ("Val.", FECHAS[VAL_END - 26]), ("Prueba", FECHAS[TEST_END - 26])]:
             fig.add_annotation(x=x, y=1.06, yref="paper", text=txt, showarrow=False, font=dict(size=11, color=GRIS))
         fig.update_layout(title="Casos semanales de dengue", height=380, margin=dict(t=60, b=30), yaxis_title="Casos por semana")
-        st.plotly_chart(fig, width="stretch", theme=None, config={"displaylogo": False})
+        st.plotly_chart(style_figure(fig), width="stretch", theme=None, config={"displaylogo": False})
 
         colores = [AZUL if a <= 2020 else (NARANJA if a == 2021 else VERDE) for a in anual.index]
         figb = go.Figure(go.Bar(x=anual.index, y=anual.values, marker_color=colores))
         figb.update_layout(title="El histórico, año a año", height=300, margin=dict(t=50, b=30))
-        st.plotly_chart(figb, width="stretch", theme=None, config={"displaylogo": False})
+        st.plotly_chart(style_figure(figb), width="stretch", theme=None, config={"displaylogo": False})
 
         st.caption("Colores del histórico anual: verde petróleo = entrenamiento · ocre = validación · verde claro = prueba.")
         insight("LECTURA DEL TERRITORIO", f"{anual.idxmax()} reúne el mayor total anual de esta serie. Los conteos describen lo observado: no equivalen a riesgo por habitante ni confirman un brote.")
@@ -213,15 +212,15 @@ def render(pagina="Panorama"):
         cols = st.columns([1.1, 1])
         fh = go.Figure(go.Heatmap(z=np.log1p(M), customdata=M, hovertemplate="Año %{y} · semana %{x}<br>%{customdata:,.0f} casos<extra></extra>", x=list(range(1, 53)), y=list(range(FECHAS[0].year, FECHAS[0].year + n_y)),
                                   colorscale=[[0,"#F0F3E9"],[0.45,"#9BC3A9"],[1,AZUL]], colorbar=dict(title="log(1+casos)")))
-        fh.update_layout(title="Casos por año y semana epidemiológica", height=420, yaxis=dict(autorange="reversed"), xaxis_title="Semana")
-        cols[0].plotly_chart(fh, width="stretch", theme=None)
+        fh.update_layout(title="Casos por año y semana", height=420, yaxis=dict(autorange="reversed"), xaxis_title="Semana")
+        cols[0].plotly_chart(style_figure(fh), width="stretch", theme=None)
         Mn = M / np.where(M.mean(axis=1, keepdims=True) == 0, 1, M.mean(axis=1, keepdims=True))
         fp = go.Figure()
         for i in range(n_y):
             fp.add_trace(go.Scatter(x=list(range(1, 53)), y=Mn[i], mode="lines", line=dict(color="rgba(31,111,178,0.18)", width=1), showlegend=False))
         fp.add_trace(go.Scatter(x=list(range(1, 53)), y=Mn.mean(axis=0), mode="lines", line=dict(color=AZUL, width=3), name="Perfil medio"))
-        fp.update_layout(title="Perfil semanal (cada año ÷ su media): ¿hay estacionalidad?", height=420, xaxis_title="Semana", yaxis_title="Relativo a la media del año")
-        cols[1].plotly_chart(fp, width="stretch", theme=None)
+        fp.update_layout(title="Perfil semanal · cada año ÷ su media", height=420, xaxis_title="Semana", yaxis_title="Relativo a la media del año")
+        cols[1].plotly_chart(style_figure(fp), width="stretch", theme=None)
         st.caption("Los mapas de calor usan escala logarítmica para distinguir valores pequeños; el cursor muestra el conteo real. Si hubiera una estacionalidad anual marcada, las líneas claras se parecerían entre sí y el perfil medio mostraría picos definidos. "
                    "En este conjunto de datos dominan los ciclos epidémicos de varios años sobre el patrón anual.")
 
@@ -232,7 +231,7 @@ def render(pagina="Panorama"):
         fm = go.Figure(go.Heatmap(z=np.log1p(sem_anio.values), customdata=sem_anio.values, hovertemplate="%{y} · %{x}<br>%{customdata:,.0f} casos<extra></extra>", x=sem_anio.columns, y=[f"{nombres.loc[c, 'municipio']} ({c})" for c in tops],
                                   colorscale=[[0,"#F0F3E9"],[0.45,"#9BC3A9"],[1,AZUL]], colorbar=dict(title="log(1+casos)")))
         fm.update_layout(height=max(350, 22 * n_top + 120), yaxis=dict(autorange="reversed"), title="Casos por municipio y año (mapa de calor)")
-        st.plotly_chart(fm, width="stretch", theme=None, config={"displaylogo": False})
+        st.plotly_chart(heatmap_labels(style_figure(fm)), width="stretch", theme=None, config={"displaylogo": False})
 
         st.subheader("Departamentos por año")
         dep = panel.loc[~ES_EXTERIOR].groupby(nombres.loc[~ES_EXTERIOR, "departamento"]).sum()
@@ -240,7 +239,7 @@ def render(pagina="Panorama"):
         dep_anio = dep_anio.loc[dep_anio.sum(axis=1).sort_values(ascending=False).index]
         fd = go.Figure(go.Heatmap(z=np.log1p(dep_anio.values), customdata=dep_anio.values, hovertemplate="%{y} · %{x}<br>%{customdata:,.0f} casos<extra></extra>", x=dep_anio.columns, y=dep_anio.index, colorscale=[[0,"#F0F3E9"],[0.45,"#9BC3A9"],[1,AZUL]], colorbar=dict(title="log(1+casos)")))
         fd.update_layout(height=620, yaxis=dict(autorange="reversed"))
-        st.plotly_chart(fd, width="stretch", theme=None, config={"displaylogo": False})
+        st.plotly_chart(heatmap_labels(style_figure(fd)), width="stretch", theme=None, config={"displaylogo": False})
         st.caption("No hay mapa geográfico porque el conjunto de datos no trae coordenadas; el mapa coroplético queda para la Fase 3 (DIVIPOLA/DANE).")
 
     # ================================================================= PRONOSTICO
@@ -288,7 +287,7 @@ def render(pagina="Panorama"):
         fig.add_trace(go.Scatter(x=p.index, y=p["yhat"], mode="lines", name=f"Pronóstico ({modelo})", line=dict(color=AZUL if modelo == "SARIMA" else NARANJA, width=2.2, dash="solid" if modelo == "SARIMA" else "dash")))
         fig.add_trace(go.Scatter(x=real.index, y=real.values, mode="lines+markers", name="Observado", line=dict(color="black", width=1.5), marker=dict(size=4)))
         fig.update_layout(height=430, margin=dict(t=40), yaxis_title="Casos por semana", legend=dict(orientation="h", y=1.1))
-        st.plotly_chart(fig, width="stretch", theme=None, config={"displaylogo": False})
+        st.plotly_chart(style_figure(fig), width="stretch", theme=None, config={"displaylogo": False})
         m1, m2, m3 = st.columns(3)
         metric(m1, "Error absoluto medio · MAE", f"{mae(real.values, p['yhat'].values):.1f}")
         metric(m2, "Error cuadrático · RMSE", f"{rmse(real.values, p['yhat'].values):.1f}")
@@ -339,7 +338,7 @@ def render(pagina="Panorama"):
             fig.add_trace(go.Scatter(x=sel.index, y=sel["obs"], mode="markers", name=nivel.capitalize(),
                                      marker=dict(color=COLOR_NIVEL[nivel], size=11 if nivel == "rojo" else 8, line=dict(color="white", width=1))))
         fig.update_layout(height=450, margin=dict(t=30), yaxis_title="Casos por semana", legend=dict(orientation="h", y=1.1))
-        st.plotly_chart(fig, width="stretch", theme=None, config={"displaylogo": False})
+        st.plotly_chart(style_figure(fig), width="stretch", theme=None, config={"displaylogo": False})
 
         det = ta[ta["nivel"] != "verde"][["obs", "yhat", "hi", "alerta_sarima", "alerta_ears", "alerta_canal", "nivel"]].copy()
         det.columns = ["Observado", "Esperado", "Límite sup. IC95", "SARIMA", "EARS C2", "Canal endémico", "Nivel"]

@@ -54,7 +54,8 @@ def main():
     st.set_page_config(page_title="EpiSentinel AI · Plataforma", page_icon="◈", layout="wide", initial_sidebar_state="collapsed")
     st.markdown((ROOT / "app/analysis_styles.css").read_text(encoding="utf-8"), unsafe_allow_html=True)
     st.markdown('<div class="epi-brand"><span class="epi-mark">E</span><div>EpiSentinel <b>AI</b><small>VIGILANCIA CON EVIDENCIA</small></div><span class="epi-academic">PLATAFORMA I2 · ACADÉMICA</span></div>', unsafe_allow_html=True)
-    destination = st.radio("Ambiente de trabajo", DESTINATIONS, horizontal=True, key="epi_platform_nav", label_visibility="collapsed")
+    with st.container(key="epi_primary_nav"):
+        destination = st.radio("Ambiente de trabajo", DESTINATIONS, horizontal=True, key="epi_platform_nav", label_visibility="collapsed")
     if destination == DESTINATIONS[0]:
         render_observatory(embedded=True)
     elif destination == DESTINATIONS[1]:
