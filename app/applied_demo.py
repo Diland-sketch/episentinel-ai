@@ -133,10 +133,13 @@ def render(root,context):
         if key not in st.session_state and key in preferences:
             st.session_state[key]=preferences[key]
     st.markdown("## Demostración científica aplicada")
-    section=st.radio("Componente de demostración",("Resultados guardados","Diseño temporal","Escalabilidad"),horizontal=True,key="epi_demo_section")
+    section=st.radio("Componente de demostración",("Resultados guardados","Diseño temporal","Escalabilidad","Pronóstico retrospectivo"),horizontal=True,key="epi_demo_section")
     if section=="Resultados guardados": saved_results(root,context)
     elif section=="Diseño temporal": experimental_design()
-    else: scalability(root,context)
+    elif section=="Escalabilidad": scalability(root,context)
+    else:
+        from app.retrospective_app import render as render_retrospective
+        render_retrospective(root)
     for key in keys:
         if key in st.session_state:
             preferences[key]=st.session_state[key]
