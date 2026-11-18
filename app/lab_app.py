@@ -183,10 +183,14 @@ def render():
     if "epi_lab_mode_widget" not in st.session_state:
         st.session_state.epi_lab_mode_widget = st.session_state.get("epi_lab_mode", "Recorrido científico")
     with st.container(key="epi_secondary_nav"):
-        mode = st.radio("Explorar el Laboratorio", ("Recorrido científico", "Vistas históricas"), horizontal=True,
+        mode = st.radio("Explorar el Laboratorio", ("Recorrido científico", "Vistas históricas", "Demostración aplicada"), horizontal=True,
                         key="epi_lab_mode_widget", on_change=mode_changed)
     if mode == "Recorrido científico":
         render_journey()
+    elif mode == "Demostración aplicada":
+        from app.applied_demo import render as render_applied
+        root = historical.RAIZ
+        render_applied(root, cached_context(str(root), evidence_signature(root)))
     else:
         st.markdown("## Archivo de experimentos históricos")
         st.caption("Las cinco vistas originales permanecen disponibles. Vuelve al recorrido científico para revisar su trazabilidad.")
