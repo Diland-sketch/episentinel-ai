@@ -128,4 +128,23 @@ header[data-testid="stHeader"]{background:var(--epi-ivory);}
 @media(max-width:900px){.epi-hero{grid-template-columns:1fr}.epi-analysis-header{flex-direction:row}.epi-analysis-header aside{align-items:flex-end;text-align:right}.epi-lab-phase{gap:12px}}
 @media(max-width:600px){[data-testid="stMainBlockContainer"]{padding:4rem .9rem 1rem}.epi-brand{font-size:22px}.epi-hero{padding:26px 23px}.epi-hero h1{font-size:35px}.epi-hero p{font-size:14px}.epi-section h2{font-size:25px}.epi-analysis-header{padding:19px 21px;flex-direction:column;gap:10px}.epi-analysis-header h1{font-size:28px}.epi-analysis-header aside{align-items:flex-start;text-align:left;min-width:0;gap:4px}.epi-analysis-header aside small{font-size:10px}.epi-step{padding:9px 11px}.epi-chart-heading h2{font-size:21px}.epi-chart-note{display:none}.st-key-epi_plot_shell{padding:15px 7px 8px!important}.epi-coverage-card{padding:20px}.epi-evidence{padding:21px}.epi-evidence-grid{grid-template-columns:1fr 1fr;gap:18px 12px}.epi-evidence-item strong{font-size:12px}.epi-lab-hero{padding:22px}.epi-lab-hero h1{font-size:28px}.epi-lab-phase{padding:21px}.epi-lab-phase h2{font-size:25px}.st-key-epi_primary_nav [data-testid="stRadioOption"]{padding:7px 11px!important;width:100%;}.st-key-epi_primary_nav [role="radiogroup"]{gap:0!important;}.st-key-epi_chapter_nav [data-testid="stRadioOption"]{min-width:0;width:100%;flex:auto;}.st-key-epi_secondary_nav [data-testid="stRadioOption"]{padding:6px 9px!important;}}
 @media(prefers-reduced-motion:reduce){.stApp *,.stApp *::before,.stApp *::after{animation:none!important;transition:none!important;scroll-behavior:auto!important;transform:none!important;}}
+
+/* UX-Demo I1: compact canonical entry and a focused session summary. */
+.st-key-epi_upload_panel{padding:18px 22px!important;}
+.st-key-epi_upload_panel [data-testid="stVerticalBlock"]{gap:.55rem;}
+.st-key-epi_upload_panel [data-testid="stForm"]{border-color:#B3C6BD;padding:14px 16px;}
+.st-key-epi_upload_panel [data-testid="stTextInput"] input{background:#FFF;color:var(--epi-text);border:1px solid #9DABA9;border-radius:8px;min-height:42px;font-size:15px;}
+.st-key-epi_upload_panel [data-testid="stFormSubmitButton"] button{background:var(--epi-oil)!important;border-color:var(--epi-oil)!important;color:#FFF!important;min-height:42px;padding:8px 20px;border-radius:9px;}
+.st-key-epi_upload_panel [data-testid="stFormSubmitButton"] button p{color:#FFF!important;}
+.st-key-epi_upload_panel [data-testid="stFormSubmitButton"] button:hover{background:var(--epi-mineral)!important;}
+.st-key-epi_upload_panel [data-testid="stWidgetLabel"] p{font-size:14px;font-weight:600;}
+.st-key-epi_upload_panel [data-testid="stAlert"]{border-left:3px solid var(--epi-mineral);}
+.st-key-epi_upload_panel [data-testid="stAlert"]:has([data-testid="stAlertContentError"]){background:#FFF0E9!important;border-left-color:#9B3F29;}
+.st-key-epi_input_summary{background:#E5EFE9;border:1px solid #BCD1C7;border-radius:12px;padding:14px 18px!important;}
+.st-key-epi_input_summary [data-testid="stMetricLabel"] p{color:var(--epi-oil)!important;font-size:14px!important;}
+.st-key-epi_input_summary [data-testid="stMetricValue"]{color:var(--epi-oil);font-size:32px;line-height:1.25;}
+.stApp [data-testid="stCaptionContainer"] p{font-size:13px;line-height:1.5;color:#40575C!important;}
+.st-key-epi_secondary_nav [data-testid="stRadioOption"] p{font-size:13px!important;}
+.epi-section{margin:10px 0 7px;}.epi-section h2{padding:6px 0;}.epi-section p{margin-bottom:6px;}
+@media(max-width:700px){.st-key-epi_upload_panel{padding:15px!important;}.st-key-epi_upload_panel [data-testid="stForm"] [data-testid="stHorizontalBlock"]{flex-wrap:wrap;}.st-key-epi_upload_panel [data-testid="stForm"] [data-testid="stColumn"]{min-width:140px;flex:1 1 140px;}}
 </style>
