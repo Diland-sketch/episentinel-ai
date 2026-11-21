@@ -1,0 +1,11 @@
+{
+  "filename": "panel_casos.parquet",
+  "bytes": 1047381,
+  "sha256": "41e592e9fb548085377a1c6d7ed7de026496d8c530583ba5aaf6c80e2fee5989",
+  "rows": 1124,
+  "positions": 832,
+  "source": "INS / Datos de Vigilancia en Salud Publica de Colombia / 4hyg-wa9d",
+  "provenance": "data/README.md and docs/PROCEDENCIA_B02.md",
+  "license": "CC BY-SA 4.0; preserve attribution and identify historical transformations",
+  "transformations": "Historical panel: events 210+220, S53 folded into S52, missing combinations filled with zero; technical 7D dates, not official epidemiological calendar"
+}

@@ -1,0 +1,56 @@
+# Template only. Creating/applying a Blueprint is a MANUAL owner action.
+# No paid services, disks, databases, workers, cron or preview environments.
+services:
+  - type: web
+    name: episentinel-api
+    runtime: docker
+    plan: free
+    branch: main
+    autoDeployTrigger: 'off'
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /api/v1/ready
+    envVars:
+      - key: EPISENTINEL_CORS_ORIGINS
+        sync: false
+      - key: EPISENTINEL_OPERATOR_KEY
+        sync: false
+      - key: EPISENTINEL_PANEL_URL
+        sync: false
+      - key: EPISENTINEL_PANEL_HOST
+        sync: false
+      - key: EPISENTINEL_PANEL_APPROVED_SHA256
+        sync: false
+      - key: EPISENTINEL_RUNTIME_ROOT
+        value: /tmp/episentinel
+      - key: EPISENTINEL_FORECAST_METHODS
+        value: ultimo_valor
+      - key: EPISENTINEL_ENABLE_INGESTION
+        value: '0'
+  - type: web
+    name: episentinel-react
+    runtime: static
+    branch: main
+    autoDeployTrigger: 'off'
+    rootDir: frontend
+    buildCommand: npm ci && npm run build
+    staticPublishPath: dist
+    envVars:
+      - key: NODE_VERSION
+        value: 22.16.0
+      - key: VITE_API_URL
+        sync: false
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    headers:
+      - path: /*
+        name: X-Content-Type-Options
+        value: nosniff
+      - path: /*
+        name: Referrer-Policy
+        value: no-referrer
+      - path: /*
+        name: X-Frame-Options
+        value: DENY

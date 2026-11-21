@@ -1,0 +1,180 @@
+{
+  "schema": "episentinel-render-memory-v1",
+  "created_utc": "2026-11-21T17:40:46.506210+00:00",
+  "platform": "Linux-6.18.33.2-microsoft-standard-WSL2-x86_64-with-glibc2.36",
+  "python": "3.13.4",
+  "panel": {
+    "shape": [
+      1124,
+      832
+    ],
+    "decoded_dataframe_bytes": 7495956,
+    "columns_type": "DatetimeIndex",
+    "index_type": "str",
+    "only_numeric_values": true,
+    "bytes": 1047381,
+    "sha256": "41e592e9fb548085377a1c6d7ed7de026496d8c530583ba5aaf6c80e2fee5989"
+  },
+  "code_sha256": {
+    "api/render.py": "62a20d17fa0f1eaeeb153d8a8f38985ce7c53fe9de30daa22151dcd27456c980",
+    "api/main.py": "f7d7c36c484f410846e9aa1e54e6deb267022e1f89ae0416262d478ad75b7f16",
+    "app/retrospective.py": "849ced96aad56e08530aa85b980f8b83c784eba6e5da83e9757db6af80501218",
+    "scripts/run_retrospective.py": "be2b86170c0126c185b4390bb07f894dd413d31573e8fe466cf018f1180ea972",
+    "scripts/profile_render.py": "67102a1240cb3084d1ef58bac60efcfbc6545bffd4d33c461ce6a081054414a2",
+    "deploy/requirements.lock": "7a24fdaaa3888ce27a139347f2efe2674a031eaa8207fe0cacfcc9cd9ec20679",
+    "deploy/provision.py": "c152654a8157d81ecabb90de0424b3c7f25bdcfd7d335be49e6cfc82c05bc820",
+    "deploy/start.py": "46aa320dd80c7cbe832d8466686e29fec79d9799364568ec2f59e8e39c307b87"
+  },
+  "dependencies": {
+    "numpy": "2.5.4",
+    "pandas": "3.1.0",
+    "statsmodels": "0.15.0",
+    "scipy": "1.17.1",
+    "pyarrow": "23.0.1",
+    "fastapi": "0.165.0"
+  },
+  "memory_max_bytes": 536870912,
+  "memory_swap_max_bytes": 0,
+  "cpu_max": "50000 100000",
+  "cgroup_lifetime_peak_bytes": 397172736,
+  "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\n",
+  "measurement_context": {
+    "source": "Linux /proc VmRSS and cgroup v2 memory.current, memory.peak, memory.events",
+    "period": {
+      "started_utc": "2026-11-21T17:40:20.673949+00:00",
+      "ended_utc": "2026-11-21T17:40:46.523645+00:00"
+    },
+    "universe": "One local 512 MiB container, server and children; Cali 76001, cut 779, horizon 8",
+    "aggregation": "Maximum of 10 ms samples per phase; cgroup lifetime peak read from kernel; elapsed wall time per HTTP request",
+    "validation_status": "measured_local_docker_not_Render_hardware"
+  },
+  "sampling_interval_s": 0.01,
+  "phase_sample_counts": {
+    "startup": 564,
+    "overview": 14,
+    "series": 8,
+    "ultimo_valor": 185,
+    "direct_b06_control_ultimo_valor": 200
+  },
+  "peaks": {
+    "startup": {
+      "server_rss_bytes": 168673280,
+      "forecast_children_rss_bytes": 0,
+      "cgroup_current_bytes": 323153920
+    },
+    "overview": {
+      "server_rss_bytes": 176177152,
+      "forecast_children_rss_bytes": 0,
+      "cgroup_current_bytes": 333598720
+    },
+    "series": {
+      "server_rss_bytes": 178688000,
+      "forecast_children_rss_bytes": 0,
+      "cgroup_current_bytes": 335257600
+    },
+    "ultimo_valor": {
+      "server_rss_bytes": 181092352,
+      "forecast_children_rss_bytes": 113266688,
+      "cgroup_current_bytes": 396652544
+    },
+    "direct_b06_control_ultimo_valor": {
+      "server_rss_bytes": 181092352,
+      "forecast_children_rss_bytes": 0,
+      "cgroup_current_bytes": 395169792
+    }
+  },
+  "results": [
+    {
+      "phase": "startup",
+      "status": 200,
+      "elapsed_s": 13.016974372999812
+    },
+    {
+      "phase": "overview",
+      "status": 200,
+      "elapsed_s": 0.25453857499996957
+    },
+    {
+      "phase": "series",
+      "status": 200,
+      "elapsed_s": 0.12599508399989645
+    },
+    {
+      "phase": "ultimo_valor",
+      "status": 200,
+      "elapsed_s": 3.9716913639999802,
+      "metrics": {
+        "MAE": 23.125,
+        "RMSE": 24.101348509990057,
+        "MASE": 0.1554004781553174
+      },
+      "fit_status": "no_requiere_ajuste",
+      "experiment": {
+        "request_id": "dc72e9ec4edca2e895c3b8eb72f619fb30184e69900fff33cd92f378e7372a8d",
+        "source_sha256": "41e592e9fb548085377a1c6d7ed7de026496d8c530583ba5aaf6c80e2fee5989",
+        "series": "76001",
+        "cut": 779,
+        "horizon": 8,
+        "method": "ultimo_valor"
+      },
+      "indicators": [
+        {
+          "name": "MAE",
+          "value": 23.125,
+          "source": "41e592e9fb548085377a1c6d7ed7de026496d8c530583ba5aaf6c80e2fee5989",
+          "period": "2021-12-13T00:00:00/2022-01-31T00:00:00",
+          "universe": "series=76001; positions=780..787; n=8",
+          "aggregation": "B10 mae: mean absolute error over all 8 aligned targets",
+          "validation_status": "retrospective_technical_only"
+        },
+        {
+          "name": "RMSE",
+          "value": 24.101348509990057,
+          "source": "41e592e9fb548085377a1c6d7ed7de026496d8c530583ba5aaf6c80e2fee5989",
+          "period": "2021-12-13T00:00:00/2022-01-31T00:00:00",
+          "universe": "series=76001; positions=780..787; n=8",
+          "aggregation": "B10 rmse: square root of mean squared error over all 8 aligned targets",
+          "validation_status": "retrospective_technical_only"
+        },
+        {
+          "name": "MASE",
+          "value": 0.1554004781553174,
+          "source": "41e592e9fb548085377a1c6d7ed7de026496d8c530583ba5aaf6c80e2fee5989",
+          "period": "2021-12-13T00:00:00/2022-01-31T00:00:00",
+          "universe": "series=76001; positions=780..787; n=8",
+          "aggregation": "B10 mase: MAE divided by mean absolute seasonal difference of training prefix only, m=52",
+          "validation_status": "retrospective_technical_only"
+        }
+      ],
+      "observed": [
+        57.0,
+        66.0,
+        57.0,
+        48.0,
+        68.0,
+        51.0,
+        50.0,
+        58.0
+      ],
+      "diagnostics": null,
+      "historical_predictions_intervals_match_rtol_1e8": true,
+      "historical_max_absolute_difference": 0.0,
+      "same_runtime_direct_b06_points_exact_match": true,
+      "same_runtime_direct_b06_fit_status_match": true
+    },
+    {
+      "phase": "sarima_sin_estacional",
+      "status": 503,
+      "elapsed_s": 0.003643144000079701,
+      "error": "INSUFFICIENT_MEMORY_HEADROOM"
+    }
+  ],
+  "limitations": [
+    "Local Docker Linux evidence, not a measurement on Render hardware",
+    "Cgroup includes profiler, server, children, kernel and page cache",
+    "RSS sums share pages and are not unique physical memory",
+    "One manually selected Cali origin; not a benchmark over all municipalities",
+    "CPU quota .5 is a local test configuration, not a claimed Render CPU guarantee",
+    "No RSS hard limit per request; container OOM could kill the service"
+  ]
+}
