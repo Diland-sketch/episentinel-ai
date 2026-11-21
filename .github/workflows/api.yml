@@ -1,0 +1,16 @@
+name: REST API integration
+on:
+  push:
+    branches: [feat/v2-api]
+  pull_request:
+jobs:
+  api:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - run: python -m pip install -c requirements-api-repro.txt -e '.[api,dev,app]'
+      # Real Cali tests explicitly skip without the unversioned historical panel.
+      - run: python -m pytest tests/test_api.py tests/test_forecast_service.py tests/test_sarima_service.py tests/test_csv_loader.py tests/test_isolated_pipeline.py -q -p no:cacheprovider
