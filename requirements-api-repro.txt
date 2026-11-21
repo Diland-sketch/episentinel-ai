@@ -1,0 +1,15 @@
+# Reproducible local REST/scientific validation environment (Python 3.13).
+# Install with: python -m pip install -c requirements-api-repro.txt -e '.[api,dev,app]'
+# Scientific versions match the IA-I1 evidence; this does not change algorithms.
+numpy==2.5.4
+pandas==3.1.0
+statsmodels==0.15.0
+scipy==1.17.1
+fastapi==0.165.0
+pydantic==2.14.4
+starlette==1.10.0
+uvicorn==0.54.0
+httpx==0.28.1
+pytest==9.2.0
+plotly==7.1.0
+streamlit==1.56.0
