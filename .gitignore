@@ -11,3 +11,10 @@ data/external/*
 experiments/runs/*
 !experiments/runs/.gitkeep
 .DS_Store
+frontend/node_modules/
+frontend/dist/
+frontend/.env*
+.env
+.env.*
+!frontend/.env.example
+deploy/*secret*

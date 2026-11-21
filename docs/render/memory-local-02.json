@@ -1,0 +1,164 @@
+{
+  "schema": "episentinel-render-memory-v1",
+  "created_utc": "2026-11-21T17:26:25.471657+00:00",
+  "platform": "Linux-6.18.33.2-microsoft-standard-WSL2-x86_64-with-glibc2.36",
+  "python": "3.13.4",
+  "panel": {
+    "shape": [
+      1124,
+      832
+    ],
+    "decoded_dataframe_bytes": 7495956,
+    "columns_type": "DatetimeIndex",
+    "index_type": "str",
+    "only_numeric_values": true,
+    "bytes": 1047381,
+    "sha256": "41e592e9fb548085377a1c6d7ed7de026496d8c530583ba5aaf6c80e2fee5989"
+  },
+  "dependencies": {
+    "numpy": "2.5.4",
+    "pandas": "3.1.0",
+    "statsmodels": "0.15.0",
+    "scipy": "1.17.1",
+    "pyarrow": "23.0.1",
+    "fastapi": "0.165.0"
+  },
+  "memory_max_bytes": 536870912,
+  "memory_swap_max_bytes": 0,
+  "cpu_max": "50000 100000",
+  "cgroup_lifetime_peak_bytes": 250875904,
+  "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\n",
+  "sampling_interval_s": 0.01,
+  "phase_sample_counts": {
+    "startup": 664,
+    "overview": 27,
+    "series": 11,
+    "ultimo_valor": 169,
+    "direct_b06_control_ultimo_valor": 213,
+    "sarima_sin_estacional": 748,
+    "direct_b06_control_sarima_sin_estacional": 464
+  },
+  "peaks": {
+    "startup": {
+      "server_rss_bytes": 168570880,
+      "forecast_children_rss_bytes": 0,
+      "cgroup_current_bytes": 140554240
+    },
+    "overview": {
+      "server_rss_bytes": 177651712,
+      "forecast_children_rss_bytes": 0,
+      "cgroup_current_bytes": 135245824
+    },
+    "series": {
+      "server_rss_bytes": 179421184,
+      "forecast_children_rss_bytes": 0,
+      "cgroup_current_bytes": 136585216
+    },
+    "ultimo_valor": {
+      "server_rss_bytes": 181538816,
+      "forecast_children_rss_bytes": 113004544,
+      "cgroup_current_bytes": 194691072
+    },
+    "direct_b06_control_ultimo_valor": {
+      "server_rss_bytes": 181571584,
+      "forecast_children_rss_bytes": 0,
+      "cgroup_current_bytes": 194445312
+    },
+    "sarima_sin_estacional": {
+      "server_rss_bytes": 181071872,
+      "forecast_children_rss_bytes": 202637312,
+      "cgroup_current_bytes": 250875904
+    },
+    "direct_b06_control_sarima_sin_estacional": {
+      "server_rss_bytes": 181071872,
+      "forecast_children_rss_bytes": 0,
+      "cgroup_current_bytes": 250687488
+    }
+  },
+  "results": [
+    {
+      "phase": "startup",
+      "status": 200,
+      "elapsed_s": 15.96339233699996
+    },
+    {
+      "phase": "overview",
+      "status": 200,
+      "elapsed_s": 0.5240471029999298
+    },
+    {
+      "phase": "series",
+      "status": 200,
+      "elapsed_s": 0.191120840999929
+    },
+    {
+      "phase": "ultimo_valor",
+      "status": 200,
+      "elapsed_s": 3.389132423000092,
+      "metrics": {
+        "MAE": 23.125,
+        "RMSE": 24.101348509990057,
+        "MASE": 0.1554004781553174
+      },
+      "fit_status": "no_requiere_ajuste",
+      "observed": [
+        57.0,
+        66.0,
+        57.0,
+        48.0,
+        68.0,
+        51.0,
+        50.0,
+        58.0
+      ],
+      "diagnostics": null,
+      "historical_predictions_intervals_match_rtol_1e8": true,
+      "historical_max_absolute_difference": 0.0,
+      "same_runtime_direct_b06_points_exact_match": true,
+      "same_runtime_direct_b06_fit_status_match": true
+    },
+    {
+      "phase": "sarima_sin_estacional",
+      "status": 200,
+      "elapsed_s": 16.477723260999937,
+      "metrics": {
+        "MAE": 28.695661814951045,
+        "RMSE": 29.48905993456872,
+        "MASE": 0.19283544073628867,
+        "Cobertura intervalo nominal": 1.0,
+        "Ancho medio intervalo": 153.28461634374062
+      },
+      "fit_status": "convergente",
+      "observed": [
+        57.0,
+        66.0,
+        57.0,
+        48.0,
+        68.0,
+        51.0,
+        50.0,
+        58.0
+      ],
+      "diagnostics": {
+        "converged": true,
+        "llf": -50.900850191847354,
+        "parametros_finitos": true,
+        "iterations": 11,
+        "warnflag": 0,
+        "fcalls": 60
+      },
+      "historical_predictions_intervals_match_rtol_1e8": false,
+      "historical_max_absolute_difference": 4.658087300413172e-05,
+      "same_runtime_direct_b06_points_exact_match": true,
+      "same_runtime_direct_b06_fit_status_match": true
+    }
+  ],
+  "limitations": [
+    "Local Docker Linux evidence, not a measurement on Render hardware",
+    "Cgroup includes profiler, server, children, kernel and page cache",
+    "RSS sums share pages and are not unique physical memory",
+    "One manually selected Cali origin; not a benchmark over all municipalities",
+    "CPU quota .5 is a local test configuration, not a claimed Render CPU guarantee",
+    "No RSS hard limit per request; container OOM could kill the service"
+  ]
+}

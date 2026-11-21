@@ -77,8 +77,9 @@ class BodyLimitMiddleware:
         await self.app(scope, replay, send)
 
 
-def create_app(root=ROOT, store=None):
+def create_app(root=ROOT, store=None, panel_root=None):
     root = Path(root)
+    panel_root = root if panel_root is None else Path(panel_root)
     store = store or SessionStore()
     app = FastAPI(title="EpiSentinel AI REST", version="2.0.0", openapi_url="/api/v1/openapi.json",
                   docs_url="/api/v1/docs", redoc_url="/api/v1/redoc",
@@ -137,14 +138,14 @@ def create_app(root=ROOT, store=None):
 
     def panel():
         try:
-            frame, digest = ia.load_panel(root)
+            frame, digest = ia.load_panel(panel_root)
         except (OSError, ValueError) as exc:
             raise APIError(503, "HISTORICAL_SOURCE_UNAVAILABLE", "Panel histórico ausente o incompatible", {"type": type(exc).__name__})
         return frame, s.Source(path="data/processed/panel_casos.parquet", sha256=digest)
 
     @app.get("/api/v1/health", response_model=s.Health)
     def health():
-        return s.Health(historical_source_available=(root / "data/processed/panel_casos.parquet").is_file())
+        return s.Health(historical_source_available=(panel_root / "data/processed/panel_casos.parquet").is_file())
 
     @app.get("/api/v1/overview", response_model=s.Overview)
     def overview():
